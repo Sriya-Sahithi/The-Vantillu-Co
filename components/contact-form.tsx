@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { siteConfig } from "@/lib/site-config";
+import { getWhatsAppUrl, siteConfig } from "@/lib/site-config";
 
 export function ContactForm() {
   const [feedback, setFeedback] = useState("");
@@ -13,18 +13,20 @@ export function ContactForm() {
     setFeedbackType("");
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
-    if (!siteConfig.email) {
-      setFeedback("The business email is not configured yet, so your message has not been sent. Please check back soon.");
+    const data = new FormData(form);
+    const name = String(data.get("name"));
+    const phone = String(data.get("phone") || "Not provided");
+    const note = String(data.get("message"));
+    const whatsappUrl = getWhatsAppUrl(
+      `Hello! I’m ${name}.\nPhone: ${phone}\n\n${note}`,
+    );
+    if (!whatsappUrl) {
+      setFeedback("WhatsApp is not configured yet, so your message has not been sent.");
       setFeedbackType("error");
       return;
     }
-    const data = new FormData(form);
-    const subject = encodeURIComponent(`Website enquiry from ${String(data.get("name"))}`);
-    const body = encodeURIComponent(
-      `Name: ${String(data.get("name"))}\nEmail: ${String(data.get("email"))}\nPhone: ${String(data.get("phone") || "Not provided")}\n\n${String(data.get("message"))}`,
-    );
-    window.location.href = `mailto:${encodeURIComponent(siteConfig.email)}?subject=${subject}&body=${body}`;
-    setFeedback("Your email app should open with your message. This website does not store or submit it.");
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    setFeedback("WhatsApp should open with your message. This website does not store it.");
     setFeedbackType("success");
     form.reset();
   }
@@ -36,10 +38,6 @@ export function ContactForm() {
         <input autoComplete="name" id="contact-name" maxLength={100} name="name" required />
       </div>
       <div className="form-field">
-        <label htmlFor="contact-email">Email address</label>
-        <input autoComplete="email" id="contact-email" maxLength={254} name="email" required type="email" />
-      </div>
-      <div className="form-field">
         <label htmlFor="contact-phone">Phone number <span>(optional)</span></label>
         <input autoComplete="tel" id="contact-phone" maxLength={30} name="phone" type="tel" />
       </div>
@@ -47,9 +45,9 @@ export function ContactForm() {
         <label htmlFor="contact-message">How can we help?</label>
         <textarea id="contact-message" maxLength={3000} name="message" required rows={5} />
       </div>
-      <button className="button button-primary" type="submit">Prepare your message <span aria-hidden="true">→</span></button>
+      <button className="button button-primary" type="submit">Continue on WhatsApp <span aria-hidden="true">→</span></button>
       <p aria-live="polite" className={`form-feedback${feedbackType ? ` ${feedbackType}` : ""}`}>{feedback}</p>
-      <p className="privacy-note">Your message is not stored on this website. Please avoid sharing sensitive personal information.</p>
+      <p className="privacy-note">Your note opens WhatsApp at {siteConfig.whatsappDisplay}. It is not stored on this website. Please avoid sharing sensitive personal information.</p>
     </form>
   );
 }

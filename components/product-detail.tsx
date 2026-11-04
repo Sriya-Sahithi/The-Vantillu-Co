@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowUpRight, Minus, Plus } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { ProductCard } from "@/components/product-card";
 import { getWhatsAppUrl } from "@/lib/site-config";
-import { formatPrice, products, type Product } from "@/lib/products";
+import { formatPrice, getCategoryName, products, type Product } from "@/lib/products";
 
 export function ProductDetail({ product }: { product: Product }) {
   const [packId, setPackId] = useState(product.packSizes[0]?.id ?? "");
@@ -15,9 +15,11 @@ export function ProductDetail({ product }: { product: Product }) {
   const [selectedImage, setSelectedImage] = useState(product.image);
   const selectedPack = useMemo(() => product.packSizes.find((pack) => pack.id === packId), [packId, product.packSizes]);
   const gallery = [{ src: product.image, alt: product.imageAlt }, ...(product.gallery ?? [])];
-  const mainImage = gallery.find((image) => image.src === selectedImage) ?? gallery[0];
-  const whatsappUrl = getWhatsAppUrl(`Hello! I’d like to enquire about ${product.name}${selectedPack ? ` (${selectedPack.label})` : ""}. Please let me know if it is available.`);
+  const uniqueGallery = gallery.filter((image, index, list) => list.findIndex((item) => item.src === image.src) === index);
+  const mainImage = uniqueGallery.find((image) => image.src === selectedImage) ?? uniqueGallery[0];
+  const whatsappUrl = getWhatsAppUrl(`Hello! I’d like to enquire about ${product.name}${selectedPack ? ` (${selectedPack.label})` : ""}, quantity ${quantity}. Please let me know availability and pack sizes.`);
   const relatedProducts = products.filter((item) => item.slug !== product.slug && item.category === product.category).slice(0, 3);
+  const hasPricedPacks = product.packSizes.some((pack) => typeof pack.price === "number");
 
   return (
     <div className="page-shell product-page">
@@ -28,9 +30,9 @@ export function ProductDetail({ product }: { product: Product }) {
             <Image alt={mainImage.alt} fill priority sizes="(max-width: 800px) 100vw, 55vw" src={mainImage.src} />
             <span className="image-note">Reference image · replace with actual product photo</span>
           </div>
-          {gallery.length > 1 && (
+          {uniqueGallery.length > 1 && (
             <div aria-label="Product image gallery" className="gallery-thumbnails">
-              {gallery.map((image, index) => (
+              {uniqueGallery.map((image, index) => (
                 <button
                   aria-label={`Show reference image ${index + 1}`}
                   aria-pressed={selectedImage === image.src}
@@ -46,16 +48,25 @@ export function ProductDetail({ product }: { product: Product }) {
           )}
         </div>
         <div className="product-detail-copy">
-          <span className="eyebrow">The Vantillu Co. · product details to be confirmed</span>
+          <span className="eyebrow">{getCategoryName(product.category)}</span>
           <h1>{product.name}</h1>
-          <p className="detail-price">{selectedPack ? formatPrice(selectedPack.price) : "Price to be confirmed"} <span>sample price · INR</span></p>
+          <p className="detail-price">
+            {selectedPack?.price !== undefined ? formatPrice(selectedPack.price) : "Price on enquiry"}
+            <span>{hasPricedPacks ? " INR" : " · WhatsApp +91 9441343257"}</span>
+          </p>
           <p className="detail-description">{product.description}</p>
-          <div className="detail-field">
-            <label htmlFor="pack-size">Choose a pack size</label>
-            <select id="pack-size" onChange={(event) => setPackId(event.target.value)} value={packId}>
-              {product.packSizes.map((pack) => <option key={pack.id} value={pack.id}>{pack.label} · {formatPrice(pack.price)} sample</option>)}
-            </select>
-          </div>
+          {product.packSizes.length > 1 && (
+            <div className="detail-field">
+              <label htmlFor="pack-size">Choose a pack size</label>
+              <select id="pack-size" onChange={(event) => setPackId(event.target.value)} value={packId}>
+                {product.packSizes.map((pack) => (
+                  <option key={pack.id} value={pack.id}>
+                    {pack.label}{pack.price !== undefined ? ` · ${formatPrice(pack.price)}` : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="detail-field">
             <label>Quantity</label>
             <div aria-label="Quantity" className="quantity-control">
@@ -72,31 +83,29 @@ export function ProductDetail({ product }: { product: Product }) {
               <p className="config-hint">WhatsApp ordering will appear once a business number is configured.</p>
             )}
           </div>
-          <p className="enquiry-note">Your cart is an enquiry only. We’ll confirm availability, final pricing and delivery details with you; no payment is taken here.</p>
+          <p className="enquiry-note">Your cart is an enquiry only. We’ll confirm availability, pack sizes, pricing and delivery on WhatsApp. No payment is taken here.</p>
           <div className="product-facts">
             <details>
               <summary>Product details</summary>
               <dl className="product-facts-list">
-                <dt>Ingredients</dt><dd>{product.ingredients ?? "To be confirmed by the business owner."}</dd>
-                <dt>Allergen information</dt><dd>{product.allergens ?? "To be confirmed by the business owner."}</dd>
-                <dt>Net quantity</dt><dd>{product.netQuantity ?? "To be confirmed by the business owner."}</dd>
+                <dt>Ingredients</dt><dd>{product.ingredients ?? "To be confirmed when you enquire."}</dd>
+                <dt>Allergen information</dt><dd>{product.allergens ?? "To be confirmed when you enquire."}</dd>
+                <dt>Net quantity</dt><dd>{product.netQuantity ?? "To be confirmed when you enquire."}</dd>
                 <dt>Food labelling</dt><dd>{product.labellingInformation ?? "To be reviewed and added before launch."}</dd>
               </dl>
             </details>
             <details>
               <summary>Storage & shelf life</summary>
               <dl className="product-facts-list">
-                <dt>Shelf life</dt><dd>{product.shelfLife ?? "To be confirmed by the business owner."}</dd>
-                <dt>Storage</dt><dd>{product.storage ?? "To be confirmed by the business owner."}</dd>
+                <dt>Shelf life</dt><dd>{product.shelfLife ?? "To be confirmed when you enquire."}</dd>
+                <dt>Storage</dt><dd>{product.storage ?? "To be confirmed when you enquire."}</dd>
               </dl>
             </details>
             <details>
               <summary>Availability & dispatch</summary>
               <dl className="product-facts-list">
                 <dt>Availability</dt><dd>{product.availability === "unavailable" ? "Currently unavailable." : product.availability === "available" ? "Available." : "To be confirmed when you enquire."}</dd>
-                <dt>Stock</dt><dd>{product.stock === undefined ? "To be confirmed." : product.stock}</dd>
-                <dt>Preparation estimate</dt><dd>{product.preparationEstimate ?? "To be confirmed."}</dd>
-                <dt>Dispatch estimate</dt><dd>{product.dispatchEstimate ?? "To be confirmed."}</dd>
+                <dt>Made in</dt><dd>Hyderabad, in small batches.</dd>
               </dl>
             </details>
           </div>

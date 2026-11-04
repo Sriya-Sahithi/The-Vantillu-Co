@@ -2,9 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Product } from "@/lib/products";
-import { formatPrice } from "@/lib/products";
+import { formatPrice, getCategoryName } from "@/lib/products";
 
 export function ProductCard({ product }: { product: Product }) {
+  const listedPrice = product.packSizes.find((pack) => typeof pack.price === "number")?.price;
+
   return (
     <article className="product-card">
       <Link aria-label={`View ${product.name}`} className="product-image-link" href={`/product/${product.slug}`}>
@@ -16,7 +18,10 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="product-card-copy">
         <div>
           <Link className="product-name" href={`/product/${product.slug}`}>{product.name}</Link>
-          <p className="product-price">{formatPrice(product.packSizes[0].price)} <span>· sample price</span></p>
+          <p className="product-price">
+            {listedPrice !== undefined ? formatPrice(listedPrice) : getCategoryName(product.category)}
+            <span> · enquire on WhatsApp</span>
+          </p>
         </div>
         <Link aria-label={`View ${product.name}`} className="round-arrow" href={`/product/${product.slug}`}>
           <ArrowUpRight size={18} />

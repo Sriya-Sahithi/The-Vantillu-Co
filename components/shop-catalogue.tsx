@@ -25,8 +25,6 @@ export function ShopCatalogue() {
       return matchesCategory && matchesQuery;
     });
     if (sort === "name") return [...matching].sort((a, b) => a.name.localeCompare(b.name));
-    if (sort === "price-low") return [...matching].sort((a, b) => a.packSizes[0].price - b.packSizes[0].price);
-    if (sort === "price-high") return [...matching].sort((a, b) => b.packSizes[0].price - a.packSizes[0].price);
     return matching;
   }, [category, query, sort]);
 
@@ -43,8 +41,6 @@ export function ShopCatalogue() {
           <select id="product-sort" onChange={(event) => setSort(event.target.value)} value={sort}>
             <option value="featured">Featured</option>
             <option value="name">Name: A to Z</option>
-            <option value="price-low">Price: low to high</option>
-            <option value="price-high">Price: high to low</option>
           </select>
         </label>
       </div>
@@ -54,7 +50,7 @@ export function ShopCatalogue() {
           <button aria-pressed={category === item.id} className={category === item.id ? "filter-chip active" : "filter-chip"} key={item.id} onClick={() => setCategory(item.id)} type="button">{item.name}</button>
         ))}
       </div>
-      <p className="product-result-count">{shownProducts.length} {shownProducts.length === 1 ? "little something" : "little somethings"}</p>
+      <p className="product-result-count">{shownProducts.length} {shownProducts.length === 1 ? "homemade product" : "homemade products"}</p>
       {shownProducts.length ? (
         <div className="product-grid shop-product-grid">
           {shownProducts.map((product) => <ProductCard key={product.slug} product={product} />)}

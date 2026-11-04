@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, Instagram } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 import { getWhatsAppUrl, siteConfig } from "@/lib/site-config";
 
 export function SiteFooter() {
@@ -9,14 +10,13 @@ export function SiteFooter() {
       <div className="footer-main">
         <div className="footer-brand">
           <Link className="wordmark footer-wordmark" href="/">
-            <span className="wordmark-mark" aria-hidden="true">వ</span>
-            <span>The Vantillu <i>Co.</i></span>
+            <BrandMark />
           </Link>
-          <p>From an Indian home kitchen, with warmth in every little detail.</p>
-          <a className="footer-social" href={siteConfig.instagramUrl || "/contact"} rel="noreferrer" target={siteConfig.instagramUrl ? "_blank" : undefined}>
-            <Instagram size={17} /> Instagram <ArrowUpRight size={14} />
-            {!siteConfig.instagramUrl && <span className="sr-only"> (link to be added)</span>}
+          <p>{siteConfig.tagline} Traditional homemade goodness, made fresh in small batches.</p>
+          <a className="footer-social" href={siteConfig.instagramUrl} rel="noreferrer" target="_blank">
+            <Instagram size={17} /> {siteConfig.instagramHandle} <ArrowUpRight size={14} />
           </a>
+          <p className="footer-thanks">Thank you for supporting small and homemade.</p>
         </div>
         <div>
           <h2>Explore</h2>
@@ -33,10 +33,14 @@ export function SiteFooter() {
         </div>
         <div>
           <h2>Say hello</h2>
-          {siteConfig.email ? <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a> : <Link href="/contact">Business email to be added</Link>}
-          {siteConfig.phone ? <a href={`tel:${siteConfig.phone}`}>{siteConfig.phone}</a> : <Link href="/contact">Business phone to be added</Link>}
-          <a href={whatsappUrl ?? "/contact"} rel={whatsappUrl ? "noreferrer" : undefined} target={whatsappUrl ? "_blank" : undefined}>
-            WhatsApp ordering{!whatsappUrl && <span className="sr-only"> (number to be configured)</span>}
+          <p className="footer-contact">{siteConfig.location}</p>
+          {whatsappUrl ? (
+            <a href={whatsappUrl} rel="noreferrer" target="_blank">
+              WhatsApp {siteConfig.whatsappDisplay}
+            </a>
+          ) : null}
+          <a href={siteConfig.instagramUrl} rel="noreferrer" target="_blank">
+            Instagram {siteConfig.instagramHandle}
           </a>
         </div>
         <div className="footer-registration">
@@ -48,7 +52,7 @@ export function SiteFooter() {
       </div>
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} The Vantillu Co.</span>
-        <span>Made with care, from our vantillu to yours.</span>
+        <span>Traditional roots, modern soul.</span>
       </div>
     </footer>
   );

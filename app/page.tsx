@@ -4,32 +4,42 @@ import { ArrowDown, ArrowRight, ArrowUpRight, Sprout } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { TestimonialSection } from "@/components/testimonial-section";
 import { categories, products } from "@/lib/products";
+import { siteConfig } from "@/lib/site-config";
+
+const featured = [
+  products.find((product) => product.slug === "dark-chocolate"),
+  products.find((product) => product.slug === "kandi-podi"),
+  products.find((product) => product.slug === "mixed-dry-fruit-laddu"),
+  products.find((product) => product.slug === "oats-chocolate-chip-cookies"),
+].filter((product): product is NonNullable<typeof product> => Boolean(product));
 
 export default function HomePage() {
   return (
     <>
       <section className="hero">
         <div className="hero-copy">
-          <span className="eyebrow"><span className="eyebrow-dot" /> A little taste of home</span>
-          <h1>From our<br /><em>vantillu</em> to yours.</h1>
-          <p>Homemade spice blends and little indulgences inspired by the flavours, traditions, and warmth of an Indian home kitchen.</p>
+          <span className="eyebrow"><span className="eyebrow-dot" /> {siteConfig.tagline}</span>
+          <h1>Traditional roots,<br /><em>modern soul.</em></h1>
+          <p>Homemade chocolates, traditional podis, healthy sweets and cookies — made fresh in small batches in Hyderabad.</p>
           <div className="hero-actions">
             <Link className="button button-primary" href="/shop">Explore our goodness <ArrowRight size={17} /></Link>
             <Link className="text-link" href="/story">Our story <ArrowUpRight size={16} /></Link>
           </div>
-          <div className="hero-footnote"><span>01 / 04</span><span className="hero-rule" /><span>Made to feel like home</span></div>
+          <div className="hero-footnote"><span>01 / 04</span><span className="hero-rule" /><span>Made fresh in small batches</span></div>
         </div>
         <div className="hero-image">
           <Image alt="A colourful home-style meal on a banana leaf, used as mood imagery" fill priority sizes="(max-width: 800px) 100vw, 58vw" src="https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?auto=format&fit=crop&w=1600&q=90" />
           <div className="hero-image-tag"><span>Our kind of table</span><small>Reference image · replace with your kitchen</small></div>
-          <div className="hero-stamp" aria-hidden="true"><span>made with</span><strong>care</strong><span>every day</span></div>
+          <div className="hero-stamp">
+            <Image alt="" fill sizes="108px" src="/brand/kitchen-seal.jpg" />
+          </div>
         </div>
         <a className="scroll-cue" href="#categories"><ArrowDown size={15} /> Take a look around</a>
       </section>
 
       <section className="section categories-section" id="categories">
         <div className="section-heading">
-          <div><span className="eyebrow">A place for every craving</span><h2>Find your <em>favourite.</em></h2></div>
+          <div><span className="eyebrow">Four homemade collections</span><h2>Find your <em>favourite.</em></h2></div>
           <Link className="text-link" href="/shop">Shop everything <ArrowUpRight size={16} /></Link>
         </div>
         <div className="category-grid">
@@ -50,21 +60,21 @@ export default function HomePage() {
           <div><span className="eyebrow">A few things from our kitchen</span><h2>Little <em>favourites.</em></h2></div>
           <Link className="text-link" href="/shop">Meet the whole collection <ArrowUpRight size={16} /></Link>
         </div>
-        <p className="placeholder-note">Prices and pack sizes shown are development samples only. Please confirm all details before launch.</p>
+        <p className="placeholder-note">Pack sizes and prices are shared on WhatsApp when you enquire. Nothing is sold or paid for on this website.</p>
         <div className="product-grid featured-grid">
-          {products.slice(0, 4).map((product) => <ProductCard key={product.slug} product={product} />)}
+          {featured.map((product) => <ProductCard key={product.slug} product={product} />)}
         </div>
       </section>
 
       <section className="promise-section">
         <div className="promise-mark"><Sprout size={29} strokeWidth={1.2} /></div>
         <span className="eyebrow">What matters to us</span>
-        <h2>Good food begins<br />with <em>good intentions.</em></h2>
-        <p>We believe the little things matter: knowing what goes into your food, treating familiar recipes with care, and sharing them with warmth.</p>
+        <h2>Homemade goodness,<br />made with <em>love.</em></h2>
+        <p>The Vantillu Co. is a modern homemade food kitchen — traditional Indian flavours, presented with care.</p>
         <div className="promise-values">
-          <span>Home-prepared</span><span>Traditional flavours</span><span>Clear ingredients</span><span>Thoughtful packaging</span>
+          <span>Homemade</span><span>Natural ingredients</span><span>No preservatives</span><span>Made with love</span>
         </div>
-        <p className="placeholder-note promise-disclaimer">These are brand values, not verified product or preparation claims. Product-specific details will be added when confirmed.</p>
+        <p className="placeholder-note promise-disclaimer">These are brand values from our catalogue, not verified product claims. Product-specific details will be added when confirmed.</p>
       </section>
 
       <section className="kitchen-section">
@@ -74,18 +84,18 @@ export default function HomePage() {
         </div>
         <div className="kitchen-copy">
           <span className="eyebrow">A note from our kitchen</span>
-          <h2>Every kitchen has<br />a story worth <em>sharing.</em></h2>
-          <p>This space is saved for the people, recipes, and real moments behind The Vantillu Co. Add your own story and photographs here when you are ready.</p>
+          <h2>Crafted by {siteConfig.craftedBy}.<br /><em>Traditional roots, modern soul.</em></h2>
+          <p>Every batch is made in Hyderabad with the feeling of a home kitchen — then wrapped with a modern, premium touch.</p>
           <Link className="text-link" href="/story">A little more about us <ArrowRight size={16} /></Link>
-          <div className="signature">The Vantillu Co. <span>Our story, in the making</span></div>
+          <div className="signature">Crafted by {siteConfig.craftedBy} <span>The Vantillu Co.</span></div>
         </div>
       </section>
 
       <TestimonialSection />
 
       <section className="newsletter-strip">
-        <span className="eyebrow">Something on your mind?</span>
-        <h2>We’d love to <em>hear from you.</em></h2>
+        <span className="eyebrow">Ready to order?</span>
+        <h2>Message us on <em>WhatsApp.</em></h2>
         <Link className="button button-outline" href="/contact">Say hello <ArrowRight size={16} /></Link>
       </section>
     </>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 import { useCart } from "@/components/cart-provider";
 import { siteConfig } from "@/lib/site-config";
 
@@ -32,8 +33,7 @@ export function SiteHeader() {
             {open ? <X size={21} /> : <Menu size={21} />}
           </button>
           <Link className="wordmark" href="/" onClick={() => setOpen(false)}>
-            <span className="wordmark-mark" aria-hidden="true">వ</span>
-            <span>The Vantillu <i>Co.</i></span>
+            <BrandMark />
           </Link>
           <nav aria-label="Main navigation" className={`main-nav${open ? " is-open" : ""}`}>
             {links.map((link) => (
