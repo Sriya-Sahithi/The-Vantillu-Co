@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { CartProvider } from "@/components/cart-provider";
 import { SiteFooter } from "@/components/site-footer";
@@ -18,6 +19,8 @@ const sans = Outfit({
   weight: ["300", "400", "500", "600"],
   variable: "--font-sans",
 });
+
+const googleTagManagerId = process.env.NEXT_PUBLIC_GTM_ID;
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -61,6 +64,31 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={`${serif.variable} ${sans.variable}`}>
+        {googleTagManagerId ? (
+          <>
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(googleTagManagerId)}`}
+                height="0"
+                width="0"
+                style={{ display: "none", visibility: "hidden" }}
+                title="Google Tag Manager"
+              />
+            </noscript>
+            <Script
+              id="google-tag-manager-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer = window.dataLayer || []; window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});`,
+              }}
+            />
+            <Script
+              id="google-tag-manager"
+              src={`https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(googleTagManagerId)}`}
+              strategy="afterInteractive"
+            />
+          </>
+        ) : null}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]).replace(/</g, "\\u003c") }} />
         <CartProvider>
           <SiteHeader />
