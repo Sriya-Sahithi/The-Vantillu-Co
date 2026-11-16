@@ -1,11 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import type { Product } from "@/lib/products";
-import { formatPrice, getCategoryName } from "@/lib/products";
+import type { PublicProduct } from "@/lib/catalog-types";
+import { formatPaise } from "@/lib/money";
 
-export function ProductCard({ product }: { product: Product }) {
-  const listedPrice = product.packSizes.find((pack) => typeof pack.price === "number")?.price;
+export function ProductCard({ product }: { product: PublicProduct }) {
+  const note =
+    product.availability === "available" ? product.packLabel
+      : product.availability === "out_of_stock" ? "Out of stock"
+      : product.availability === "unavailable" ? "Currently unavailable"
+      : "Enquire on WhatsApp";
 
   return (
     <article className="product-card">
@@ -18,8 +22,8 @@ export function ProductCard({ product }: { product: Product }) {
         <div>
           <Link className="product-name" href={`/product/${product.slug}`}>{product.name}</Link>
           <p className="product-price">
-            {listedPrice !== undefined ? formatPrice(listedPrice) : getCategoryName(product.category)}
-            <span> · enquire on WhatsApp</span>
+            {product.pricePaise !== null ? formatPaise(product.pricePaise) : product.categoryName}
+            {note ? <span> · {note}</span> : null}
           </p>
         </div>
         <Link aria-label={`View ${product.name}`} className="round-arrow" href={`/product/${product.slug}`}>

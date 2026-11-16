@@ -3,17 +3,16 @@ import Link from "next/link";
 import { ArrowDown, ArrowRight, ArrowUpRight, Sprout } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { TestimonialSection } from "@/components/testimonial-section";
-import { categories, products } from "@/lib/products";
+import { listCategories, listProducts } from "@/lib/server/catalog";
 import { siteConfig } from "@/lib/site-config";
 
-const featured = [
-  products.find((product) => product.slug === "dark-chocolate"),
-  products.find((product) => product.slug === "kandi-podi"),
-  products.find((product) => product.slug === "mixed-dry-fruit-laddu"),
-  products.find((product) => product.slug === "oats-chocolate-chip-cookies"),
-].filter((product): product is NonNullable<typeof product> => Boolean(product));
+const FEATURED_SLUGS = ["dark-chocolate", "kandi-podi", "mixed-dry-fruit-laddu", "oats-chocolate-chip-cookies"];
 
-export default function HomePage() {
+export const revalidate = 30;
+
+export default async function HomePage() {
+  const [products, categories] = await Promise.all([listProducts(), listCategories()]);
+  const featured = FEATURED_SLUGS.flatMap((slug) => products.find((product) => product.slug === slug) ?? []);
   return (
     <>
       <section className="hero">

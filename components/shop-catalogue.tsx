@@ -4,19 +4,19 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
-import { categories, products, type ProductCategory } from "@/lib/products";
+import type { PublicCategory, PublicProduct } from "@/lib/catalog-types";
 
-export function ShopCatalogue() {
+export function ShopCatalogue({ products, categories }: { products: PublicProduct[]; categories: PublicCategory[] }) {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<ProductCategory | "all">("all");
+  const [category, setCategory] = useState<string>("all");
   const [sort, setSort] = useState("featured");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const initialCategory = params.get("category");
-    if (categories.some((item) => item.id === initialCategory)) setCategory(initialCategory as ProductCategory);
+    if (categories.some((item) => item.id === initialCategory)) setCategory(initialCategory as string);
     if (params.get("focus") === "search") document.getElementById("product-search")?.focus();
-  }, []);
+  }, [categories]);
 
   const shownProducts = useMemo(() => {
     const matching = products.filter((product) => {
@@ -26,7 +26,7 @@ export function ShopCatalogue() {
     });
     if (sort === "name") return [...matching].sort((a, b) => a.name.localeCompare(b.name));
     return matching;
-  }, [category, query, sort]);
+  }, [category, products, query, sort]);
 
   return (
     <>
@@ -57,7 +57,7 @@ export function ShopCatalogue() {
         </div>
       ) : (
         <div className="empty-state">
-          <div className="empty-state-image"><Image alt="" fill sizes="100vw" src={categories[0].image} /></div>
+          <div className="empty-state-image"><Image alt="" fill sizes="100vw" src={categories[0]?.image ?? "/images/chocolates.webp"} /></div>
           <h2>Nothing on the shelf just yet.</h2>
           <p>Try another search or browse everything in our collection.</p>
           <button className="button button-primary" onClick={() => { setQuery(""); setCategory("all"); }} type="button">Show everything</button>
