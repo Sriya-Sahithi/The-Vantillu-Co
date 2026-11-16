@@ -29,7 +29,7 @@ export default async function HomePage() {
             <Link className="button button-primary" href="/shop">Explore our collection <ArrowRight size={17} /></Link>
             <Link className="text-link" href="/story">Our brand story <ArrowUpRight size={16} /></Link>
           </div>
-          <div className="hero-footnote"><span>01 / 04 Categories</span><span className="hero-rule" /><span>Shop online or order on WhatsApp</span></div>
+          <div className="hero-footnote"><span>14 Products · 4 Collections</span><span className="hero-rule" /><span>Shop online or order on WhatsApp</span></div>
         </div>
         <div className="hero-image-wrap">
           <div className="hero-image-frame">
