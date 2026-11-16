@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { ClientApiError, api } from "@/lib/client/api";
-import { paiseToRupeeString } from "@/lib/money";
 
 type Delivery = { enabled: boolean; feePaise: number; freeThresholdPaise: number | null; postcodes: { pattern: string; label: string; enabled: boolean; feePaise: number | null }[] };
 
@@ -23,7 +22,7 @@ export default function AdminDelivery() {
     setMsg(""); setErr("");
     try { await fn(); setMsg(ok); await load(); } catch (e) { setErr(e instanceof ClientApiError ? e.message : "Failed."); }
   }
-  const saveSettings = (e: FormEvent) => { e.preventDefault(); void run(() => api("/api/admin/delivery", { method: "PUT", body: { enabled, fee, freeThreshold: threshold } }), "Delivery settings saved."); };
+  const saveSettings = (e: FormEvent) => { e.preventDefault(); void run(() => api("/api/admin/delivery", { method: "PUT", body: { enabled } }), "Delivery settings saved."); };
   const savePc = (e: FormEvent) => { e.preventDefault(); void run(async () => { await api("/api/admin/delivery/postcodes", { method: "PUT", body: pc }); setPc({ pattern: "", label: "", fee: "", enabled: true }); }, "Service area saved."); };
 
   if (!d) return err ? <p className="notice notice-error" role="alert">{err}</p> : <div className="cart-loading" role="status"><span className="spinner" aria-hidden="true" /> Loading…</div>;
