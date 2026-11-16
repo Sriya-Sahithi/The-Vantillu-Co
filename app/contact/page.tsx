@@ -6,7 +6,7 @@ import { getWhatsAppUrl, siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Contact & ordering",
-  description: "Order homemade chocolates, podis, sweets and cookies from The Vantillu Co. on WhatsApp. Hyderabad.",
+  description: "Shop homemade chocolates, traditional podis, healthy sweets and cookies from The Vantillu Co. online or on WhatsApp.",
   alternates: { canonical: "/contact" },
 };
 
