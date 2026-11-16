@@ -20,7 +20,7 @@ export default function StoryPage() {
           <p className="story-draft-label">Crafted by {siteConfig.craftedBy} · Handcrafted in Hyderabad, India</p>
         </div>
         <div className="story-hero-image">
-          <Image alt="The Vantillu Co. circular brand seal" fill priority sizes="(max-width: 760px) 100vw, 50vw" src="/brand/kitchen-seal.jpg" />
+          <Image alt="The Vantillu Co. circular brand seal" fill priority sizes="(max-width: 760px) 100vw, 50vw" src="/brand/kitchen-seal.webp" />
         </div>
       </section>
 

@@ -28,7 +28,6 @@ export function ProductDetail({ product }: { product: Product }) {
         <div className="product-detail-gallery">
           <div className="product-detail-image">
             <Image alt={mainImage.alt} fill priority sizes="(max-width: 800px) 100vw, 55vw" src={mainImage.src} />
-            <span className="image-note">Reference image · replace with actual product photo</span>
           </div>
           {uniqueGallery.length > 1 && (
             <div aria-label="Product image gallery" className="gallery-thumbnails">

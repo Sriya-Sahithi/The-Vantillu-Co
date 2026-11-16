@@ -12,7 +12,6 @@ export function ProductCard({ product }: { product: Product }) {
       <Link aria-label={`View ${product.name}`} className="product-image-link" href={`/product/${product.slug}`}>
         <div className="product-image-wrap">
           <Image alt={product.imageAlt} className="product-image" fill sizes="(max-width: 640px) 88vw, (max-width: 1024px) 44vw, 25vw" src={product.image} />
-          <span className="image-note">Reference image</span>
         </div>
       </Link>
       <div className="product-card-copy">

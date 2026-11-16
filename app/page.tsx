@@ -33,10 +33,10 @@ export default function HomePage() {
           <div className="hero-footnote"><span>01 / 04 Categories</span><span className="hero-rule" /><span>Order on WhatsApp</span></div>
         </div>
         <div className="hero-image">
-          <Image alt="A warm, artisanal table with homemade food delicacies" fill priority sizes="(max-width: 800px) 100vw, 58vw" src="https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?auto=format&fit=crop&w=1600&q=90" />
+          <Image alt="The Vantillu Co. authentic homemade food collection with artisanal podis, wholesome sweets, and chocolates on a rustic Indian kitchen table" fill priority sizes="(max-width: 800px) 100vw, 58vw" src="/images/hero-rustic-food.webp" />
           <div className="hero-image-tag"><span>The Modern Millennial Kitchen</span><small>Hyderabad, India</small></div>
           <div className="hero-stamp">
-            <Image alt="The Vantillu Co. circular brand seal" fill sizes="108px" src="/brand/kitchen-seal.jpg" />
+            <Image alt="The Vantillu Co. circular brand seal" fill sizes="108px" src="/brand/kitchen-seal.webp" />
           </div>
         </div>
         <a className="scroll-cue" href="#categories"><ArrowDown size={15} /> Discover our collections</a>
@@ -99,7 +99,7 @@ export default function HomePage() {
 
       <section className="kitchen-section">
         <div className="kitchen-image">
-          <Image alt="Traditional spices and wholesome ingredients" fill sizes="(max-width: 760px) 100vw, 55vw" src="https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=1200&q=85" />
+          <Image alt="Traditional freshly roasted spices and homemade podis prepared in small batches by The Vantillu Co." fill sizes="(max-width: 760px) 100vw, 55vw" src="/images/podis.webp" />
         </div>
         <div className="kitchen-copy">
           <span className="eyebrow">Behind the brand</span>

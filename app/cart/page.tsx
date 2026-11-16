@@ -43,7 +43,7 @@ export default function CartPage() {
       ) : items.length === 0 ? (
         <div className="empty-cart">
           <span className="empty-cart-mark" aria-hidden="true">
-            <Image alt="" height={72} src="/brand/kitchen-seal.jpg" width={72} />
+            <Image alt="The Vantillu Co. circular brand seal" height={72} src="/brand/kitchen-seal.webp" width={72} />
           </span>
           <h2>Your basket is waiting for a little something.</h2>
           <p>Take a look around and add anything you’d like to enquire about.</p>

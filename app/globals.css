@@ -9,10 +9,14 @@
   --muted: #726253;
   --line: #e5dcce;
   --line-dark: #ccbeaa;
-  --olive: #5b6b3e;
-  --olive-dark: #46532d;
-  --olive-light: #7b8e5a;
+  --forest: #43542a;
+  --olive: #526338;
+  --olive-dark: #3c4a24;
+  --olive-light: #748852;
   --olive-surface: #edf1e6;
+  --brass: #c59b27;
+  --brass-dark: #a17c18;
+  --brass-light: #dfb84f;
   --terracotta: #c4572d;
   --terracotta-dark: #a4421d;
   --terracotta-light: #de6e43;
@@ -20,8 +24,8 @@
   --chocolate: #23160e;
   --red: var(--terracotta);
   --red-dark: var(--terracotta-dark);
-  --yellow: var(--olive);
-  --green: var(--olive);
+  --yellow: var(--brass);
+  --green: var(--forest);
   --serif: var(--font-serif), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --sans: var(--font-sans), "Avenir Next", Avenir, "Segoe UI", sans-serif;
 }
@@ -162,13 +166,13 @@ h1 em, h2 em { color: var(--red); font-weight: 400; }
 .round-arrow:hover { background: var(--red); border-color: var(--red); color: white; }
 
 .promise-section { padding: 96px 24px 91px; background: #eee8da; text-align: center; }
-.promise-mark { width: 53px; height: 53px; display: grid; place-items: center; margin: 0 auto 18px; border: 1px solid #c9b898; border-radius: 50%; color: var(--green); }
+.promise-mark { width: 53px; height: 53px; display: grid; place-items: center; margin: 0 auto 18px; border: 1.5px solid var(--brass); border-radius: 50%; color: var(--forest); background: rgba(197,155,39,.08); }
 .promise-section h2 { margin: 15px 0 15px; font-size: clamp(38px, 4.4vw, 57px); }
 .promise-section > p:not(.placeholder-note) { max-width: 540px; margin: 0 auto; color: var(--muted); font-size: 13px; }
 .promise-values { max-width: 710px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 27px; margin: 31px auto 0; }
-.promise-values span { color: var(--green); font-family: var(--serif); font-size: 17px; }
-.promise-values span + span::before { content: "·"; margin-right: 26px; color: #baa579; }
-.promise-section .promise-disclaimer { max-width: 600px; margin: 22px auto 0; }
+.promise-values span { color: var(--forest); font-family: var(--serif); font-size: 17px; font-weight: 500; }
+.promise-values span + span::before { content: "·"; margin-right: 26px; color: var(--brass-dark); }
+.promise-section .promise-disclaimer { max-width: 600px; margin: 22px auto 0; color: var(--muted); font-size: 11px; }
 
 .kitchen-section { display: grid; grid-template-columns: 1fr 1fr; min-height: 505px; }
 .kitchen-image { position: relative; min-height: 430px; background: #9b7652; }
