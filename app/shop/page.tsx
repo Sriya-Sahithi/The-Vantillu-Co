@@ -18,7 +18,7 @@ export default async function ShopPage() {
         <span className="eyebrow">A little something for your table</span>
         <h1>Made with <em>a little extra love.</em></h1>
         <p>Homemade chocolates, podis, sweets and cookies — made fresh in small batches in Hyderabad.</p>
-        <p className="placeholder-note">Products with a price can be ordered online. For anything else, message us on WhatsApp. Product photographs are reference images until kitchen photography is added.</p>
+        <p className="placeholder-note">Browse all 14 products. Items marked available can be ordered online; for products awaiting pricing or fresh-batch confirmation, message us on WhatsApp. Product photographs should be replaced with current kitchen photography before launch.</p>
       </section>
       <section aria-label="Product catalogue" className="shop-content">
         <ShopCatalogue categories={categories} products={products} />
