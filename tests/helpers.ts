@@ -99,8 +99,9 @@ export const goodFields = {
   landmark: "Near park", city: "Hyderabad", district: "Hyderabad", state: "Telangana", pincode: "500034",
 };
 
-export async function seedProduct(db: Queryable, slug: string, pricePaise: number | null, stock: number, available = true) {
-  await db.query(`update products set price_paise = $2, stock = $3, is_available = $4, pack_label = '250 g' where slug = $1`, [slug, pricePaise, stock, available]);
+/** Sets a product up as a normal single-quantity item (pack_sizes cleared) unless packSizes is given. */
+export async function seedProduct(db: Queryable, slug: string, pricePaise: number | null, stock: number, available = true, packSizes: number[] | null = null) {
+  await db.query(`update products set price_paise = $2, stock = $3, is_available = $4, pack_label = '250 g', pack_sizes = $5 where slug = $1`, [slug, pricePaise, stock, available, packSizes]);
 }
 
 export function req(url: string, init: { method?: string; body?: unknown; cookie?: string; headers?: Record<string, string> } = {}) {

@@ -5,10 +5,10 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { ClientApiError, api } from "@/lib/client/api";
 import { formatPaise, paiseToRupeeString } from "@/lib/money";
 
-type P = { id: string; slug: string; name: string; categoryId: string; categoryName: string; description: string; imageUrl: string; imageAlt: string; pricePaise: number | null; packLabel: string | null; stock: number; isAvailable: boolean; archived: boolean; ingredients: string | null; allergens: string | null; netQuantity: string | null; shelfLife: string | null; storage: string | null };
-type Form = { id?: string; name: string; categoryId: string; description: string; imageUrl: string; imageAlt: string; price: string; packLabel: string; stock: string; isAvailable: boolean; ingredients: string; allergens: string; netQuantity: string; shelfLife: string; storage: string };
+type P = { id: string; slug: string; name: string; categoryId: string; categoryName: string; description: string; imageUrl: string; imageAlt: string; pricePaise: number | null; packLabel: string | null; packSizes: number[] | null; stock: number; isAvailable: boolean; archived: boolean; ingredients: string | null; allergens: string | null; netQuantity: string | null; shelfLife: string | null; storage: string | null };
+type Form = { id?: string; name: string; categoryId: string; description: string; imageUrl: string; imageAlt: string; price: string; packLabel: string; packSizes: string; stock: string; isAvailable: boolean; ingredients: string; allergens: string; netQuantity: string; shelfLife: string; storage: string };
 
-const toForm = (p: P): Form => ({ id: p.id, name: p.name, categoryId: p.categoryId, description: p.description, imageUrl: p.imageUrl, imageAlt: p.imageAlt, price: p.pricePaise === null ? "" : paiseToRupeeString(p.pricePaise), packLabel: p.packLabel ?? "", stock: String(p.stock), isAvailable: p.isAvailable, ingredients: p.ingredients ?? "", allergens: p.allergens ?? "", netQuantity: p.netQuantity ?? "", shelfLife: p.shelfLife ?? "", storage: p.storage ?? "" });
+const toForm = (p: P): Form => ({ id: p.id, name: p.name, categoryId: p.categoryId, description: p.description, imageUrl: p.imageUrl, imageAlt: p.imageAlt, price: p.pricePaise === null ? "" : paiseToRupeeString(p.pricePaise), packLabel: p.packLabel ?? "", packSizes: p.packSizes ? p.packSizes.join(", ") : "", stock: String(p.stock), isAvailable: p.isAvailable, ingredients: p.ingredients ?? "", allergens: p.allergens ?? "", netQuantity: p.netQuantity ?? "", shelfLife: p.shelfLife ?? "", storage: p.storage ?? "" });
 
 export default function AdminProducts() {
   const [list, setList] = useState<P[] | null>(null);
@@ -25,7 +25,7 @@ export default function AdminProducts() {
     e.preventDefault();
     if (!form) return;
     setBusy(true); setErr(""); setMsg("");
-    const body = { name: form.name, categoryId: form.categoryId, description: form.description, imageUrl: form.imageUrl, imageAlt: form.imageAlt, price: form.price.trim() === "" ? null : form.price, packLabel: form.packLabel, stock: Number(form.stock), isAvailable: form.isAvailable, ingredients: form.ingredients, allergens: form.allergens, netQuantity: form.netQuantity, shelfLife: form.shelfLife, storage: form.storage };
+    const body = { name: form.name, categoryId: form.categoryId, description: form.description, imageUrl: form.imageUrl, imageAlt: form.imageAlt, price: form.price.trim() === "" ? null : form.price, packLabel: form.packLabel, packSizes: form.packSizes.trim() === "" ? null : form.packSizes, stock: Number(form.stock), isAvailable: form.isAvailable, ingredients: form.ingredients, allergens: form.allergens, netQuantity: form.netQuantity, shelfLife: form.shelfLife, storage: form.storage };
     try {
       if (form.id) await api(`/api/admin/products/${form.id}`, { method: "PATCH", body });
       else await api("/api/admin/products", { body });
@@ -54,7 +54,7 @@ export default function AdminProducts() {
 
   return (
     <>
-      <div className="card-head"><h1 className="admin-title">Products</h1>{!form ? <button className="button button-primary" onClick={() => setForm({ name: "", categoryId: cats[0]?.id ?? "", description: "", imageUrl: "", imageAlt: "", price: "", packLabel: "", stock: "0", isAvailable: false, ingredients: "", allergens: "", netQuantity: "", shelfLife: "", storage: "" })} type="button">Add product</button> : null}</div>
+      <div className="card-head"><h1 className="admin-title">Products</h1>{!form ? <button className="button button-primary" onClick={() => setForm({ name: "", categoryId: cats[0]?.id ?? "", description: "", imageUrl: "", imageAlt: "", price: "", packLabel: "", packSizes: "", stock: "0", isAvailable: false, ingredients: "", allergens: "", netQuantity: "", shelfLife: "", storage: "" })} type="button">Add product</button> : null}</div>
       <div aria-live="polite">{msg ? <p className="notice" role="status">{msg}</p> : null}{err ? <p className="notice notice-error" role="alert">{err}</p> : null}</div>
       <p className="muted">A product can be ordered online only when it has a price, is marked available, and has stock. Products without a price stay “enquire on WhatsApp”.</p>
       {form ? (
@@ -63,8 +63,9 @@ export default function AdminProducts() {
           <div className="form-grid">
             {text("name", "Name", { required: true })}
             <div className="form-field"><label htmlFor="pr-cat">Category</label><select id="pr-cat" onChange={(e) => set("categoryId", e.target.value)} required value={form.categoryId}>{cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-            {text("price", "Price (₹)", { inputMode: "decimal", hint: "empty = enquiry only" })}
-            {text("packLabel", "Pack size", { hint: "e.g. 250 g" })}
+            {text("price", "Price per unit/piece (₹)", { inputMode: "decimal", hint: "empty = enquiry only" })}
+            {text("packLabel", "Unit label", { hint: "e.g. 250 g, or “per piece”" })}
+            {text("packSizes", "Pack sizes (pieces)", { hint: "e.g. 5, 10, 20, 50, 100. Empty = sold singly" })}
             {text("stock", "Stock (units)", { inputMode: "numeric", required: true })}
             <label className="check-field"><input checked={form.isAvailable} onChange={(e) => set("isAvailable", e.target.checked)} type="checkbox" /> Available for sale</label>
             <div className="form-field wide"><label htmlFor="pr-desc">Description</label><textarea id="pr-desc" maxLength={2000} onChange={(e) => set("description", e.target.value)} rows={4} value={form.description} /></div>

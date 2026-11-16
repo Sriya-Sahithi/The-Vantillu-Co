@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart-provider";
 
-export function AddToCartButton({ slug, quantity = 1, disabled = false, label = "Add to cart", variant = "primary", goToCheckout = false }: { slug: string; quantity?: number; disabled?: boolean; label?: string; variant?: "primary" | "outline"; goToCheckout?: boolean }) {
+export function AddToCartButton({ slug, quantity = 1, disabled = false, label = "Add to cart", variant = "primary", goToCheckout = false, replace = false }: { slug: string; quantity?: number; disabled?: boolean; label?: string; variant?: "primary" | "outline"; goToCheckout?: boolean; replace?: boolean }) {
   const { addItem } = useCart();
   const router = useRouter();
   const [added, setAdded] = useState(false);
@@ -14,7 +14,7 @@ export function AddToCartButton({ slug, quantity = 1, disabled = false, label = 
       className={`button ${variant === "outline" ? "button-outline" : "button-primary"} add-button`}
       disabled={disabled}
       onClick={() => {
-        addItem(slug, quantity);
+        addItem(slug, quantity, replace);
         if (goToCheckout) {
           router.push("/checkout");
           return;

@@ -24,14 +24,20 @@ export function ProductCard({ product }: { product: PublicProduct }) {
           <Link className="product-name" href={`/product/${product.slug}`}>{product.name}</Link>
           <p className="product-price">
             {product.pricePaise !== null ? formatPaise(product.pricePaise) : product.categoryName}
-            {note ? <span> · {note}</span> : null}
+            {note ? <span> {product.packSizes ? "" : "· "}{note}</span> : null}
           </p>
         </div>
         <Link aria-label={`View ${product.name}`} className="round-arrow" href={`/product/${product.slug}`}>
           <ArrowUpRight size={18} />
         </Link>
       </div>
-      {product.availability === "available" ? <AddToCartButton slug={product.slug} /> : null}
+      {product.availability === "available" ? (
+        product.packSizes ? (
+          <Link className="button button-primary add-button" href={`/product/${product.slug}`}>Choose a pack</Link>
+        ) : (
+          <AddToCartButton slug={product.slug} />
+        )
+      ) : null}
     </article>
   );
 }

@@ -101,10 +101,23 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 - `migrations/001_init.sql`: schema, indexes, constraints, RLS, privilege revokes.
 - `migrations/002_seed_catalogue.sql`: seeds the 14 existing products and 4 categories.
+- `migrations/003_pack_sizes_and_launch_prices.sql`: adds `products.pack_sizes` and sets the owner's launch prices (below). It only fills products that have no price, so it never overwrites later admin edits.
 
 Tables: `users`, `customer_profiles`, `addresses`, `categories`, `products`, `product_images`, `orders`, `order_items` (price and description snapshots), `payments`, `refunds`, `order_status_history`, `delivery_settings`, `serviceable_postcodes`, `admin_roles`, `audit_log`, `auth_otps`, `sessions`, `notification_outbox`, `webhook_events`, `rate_limits`.
 
-**Seed data does not invent prices.** All products are seeded with no price, unavailable and enquiry-only. The default serviceable PIN prefix is `500` and the delivery fee is ₹0 with no threshold. Set real values in the admin dashboard before launch.
+**Launch pricing (supplied by the owner, migration 003):**
+
+| Category | Price | How it is sold |
+| --- | --- | --- |
+| Podis (Kandi, Karivepaku, Kura Karam, Nuvvula, Palli) | ₹150 per 250 g packet | Singly: 1, 2, 3… packets (up to 20 per order) |
+| Chocolates (Dark, Milk, White) | ₹10 per piece | Packs of **5, 10, 20, 50 or 100 pieces** only (₹50, ₹100, ₹200, ₹500, ₹1,000) |
+| Laddus and cookies | no price | Not orderable online until you set a price in the admin dashboard |
+
+Pack sizes are enforced on the server: a chocolate order with any other quantity (for example 7) is rejected, whatever the browser sends. You can change prices, pack sizes (Admin → Products → "Pack sizes") and stock at any time. Leave "Pack sizes" empty to sell a product singly.
+
+**Stock is not set by the migration.** Every product still has stock 0 and is unavailable, so nothing can be bought until you enter real stock and tick "Available for sale" in Admin → Products. Chocolates count stock in pieces. Podis count stock in packets.
+
+The default serviceable PIN prefix is `500` and the delivery fee is ₹0 with no free-delivery threshold. Set real values in the admin dashboard before launch.
 
 Apply migrations with `npm run db:migrate` (needs `DATABASE_URL`). Applied migrations are tracked, so re-running is a no-op.
 
@@ -146,7 +159,7 @@ Apply migrations with `npm run db:migrate` (needs `DATABASE_URL`). Applied migra
 
 ### First-launch configuration (in the admin dashboard)
 
-- Products: set price, pack label, stock and availability. Upload images. Products without a price stay enquiry-only.
+- Products: set real stock (chocolates in pieces, podis in packets) and tick Available for sale. Prices for podis and chocolates are pre-set. Check them. Upload images. Products without a price stay enquiry-only.
 - Delivery: set the delivery fee, serviceable PIN prefixes or full PINs and enable delivery.
 - Update the policy pages in `app/policies/[slug]/page.tsx` with the business's verified shipping, returns, privacy and terms text.
 
@@ -157,7 +170,7 @@ Apply migrations with `npm run db:migrate` (needs `DATABASE_URL`). Applied migra
 ```bash
 npm run lint
 npm run typecheck
-npm test        # 80 tests: pricing, validation, payments, webhooks, access control
+npm test        # 85 tests: pricing, validation, payments, webhooks, access control
 npm run build
 ```
 
@@ -165,9 +178,9 @@ npm run build
 
 | Suite | Result |
 | --- | --- |
-| Vitest (PGlite Postgres + fake gateway) | 80 / 80 passed |
+| Vitest (PGlite Postgres + fake gateway) | 85 / 85 passed (includes pack-size and launch-price tests) |
 | Lint, `tsc --noEmit` | clean |
-| Browser end-to-end (Playwright, local Postgres + mock Razorpay Checkout/API) | 59 / 59 passed |
+| Browser end-to-end (Playwright, local Postgres + mock Razorpay Checkout/API) | 59 / 59 passed, plus 15 / 15 pack-size checks (pack picker, cart, refresh, tampered quantity, stock) |
 | `npm audit` | 7 moderate findings in dev-only lint tooling (`minimatch` via `typescript-eslint`), which pre-date this work. Do not run `npm audit fix --force` |
 
 Covered: cart add/remove/quantity/persistence/stock; checkout validation, PIN serviceability and server-calculated totals; successful, failed, dismissed and bad-signature payments; duplicate webhooks and delayed webhooks; refresh after payment; no duplicate orders; guest lookup; OTP login/logout; profile and addresses; reorder; access control (401/403/404); admin order flow, tracking and audit trail; product edits; delivery configuration; refunds; no horizontal overflow at 390 / 768 / 1024 / 1440 px.
