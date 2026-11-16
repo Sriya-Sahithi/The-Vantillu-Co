@@ -95,9 +95,8 @@ export default function CartPage() {
             <span className="eyebrow">Order summary</span>
             <h2>Almost there.</h2>
             <div className="summary-line"><span>Subtotal</span><strong>{formatPaise(quote?.subtotalPaise ?? 0)}</strong></div>
-            <div className="summary-line"><span>Delivery</span><span>Calculated at checkout</span></div>
-            {quote && quote.delivery.defaultFeePaise > 0 ? <p className="placeholder-note">Delivery from {formatPaise(quote.delivery.defaultFeePaise)}, confirmed once you enter your PIN code.</p> : null}
-            {quote?.delivery.freeThresholdPaise ? <p className="placeholder-note">Free delivery on orders of {formatPaise(quote.delivery.freeThresholdPaise)} or more.</p> : null}
+            <div className="summary-line"><span>Delivery</span><span>₹100 / ₹50 by order value</span></div>
+            <p className="placeholder-note">₹100 below ₹999 · ₹50 on orders of ₹999 and above. The exact charge is added at checkout after your PIN code is checked.</p>
             {canCheckout ? (
               <Link className="button button-primary summary-button" href="/checkout">Proceed to checkout <ArrowRight size={16} /></Link>
             ) : (
