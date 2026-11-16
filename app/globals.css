@@ -697,3 +697,31 @@ address { font-style: normal; font-size: 14px; line-height: 1.7; }
 .pack-select { min-width: 140px; }
 .pack-select select { min-height: 40px; }
 .field-label { display: block; font-size: 12px; font-weight: 600; }
+
+
+/* Persistent WhatsApp entry point for assisted ordering. */
+.whatsapp-float {
+  position: fixed;
+  z-index: 30;
+  right: max(22px, env(safe-area-inset-right));
+  bottom: max(22px, env(safe-area-inset-bottom));
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 0 17px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px;
+  background: #245c3b;
+  color: #fff;
+  box-shadow: 0 8px 26px rgba(35, 22, 14, .22);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  transition: transform .2s ease, background .2s ease;
+}
+.whatsapp-float:hover { background: #19472d; transform: translateY(-2px); }
+.whatsapp-float:focus-visible { outline-color: var(--brass); }
+@media (max-width: 480px) {
+  .whatsapp-float { right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); min-height: 46px; padding: 0 15px; }
+}

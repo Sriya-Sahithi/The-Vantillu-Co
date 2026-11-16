@@ -6,7 +6,7 @@ import { getWhatsAppUrl, siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Contact & ordering",
-  description: "Order homemade chocolates, podis, sweets and cookies from The Vantillu Co. on WhatsApp. Hyderabad.",
+  description: "Shop homemade chocolates, traditional podis, healthy sweets and cookies from The Vantillu Co. online or on WhatsApp.",
   alternates: { canonical: "/contact" },
 };
 
@@ -17,7 +17,7 @@ export default function ContactPage() {
       <section className="page-intro contact-intro">
         <span className="eyebrow">We’re right here</span>
         <h1>Let’s have a <em>little chat.</em></h1>
-        <p>Orders are placed on WhatsApp. Tell us what you’d like from the collection and we’ll confirm availability, pack sizes and delivery in Hyderabad.</p>
+        <p>Order through our website checkout when a product is available, or message us on WhatsApp for product questions, availability and personal assistance.</p>
       </section>
       <div className="contact-layout">
         <div className="contact-form-wrap">
@@ -56,18 +56,18 @@ export default function ContactPage() {
           </div>
           <div className="contact-note">
             <span className="eyebrow">How to order</span>
-            <p>Browse the collection, add what you like to your enquiry basket, then send it on WhatsApp. We’ll confirm the details with you. No payment is taken on this website.</p>
+            <p>Choose the website checkout for available products, or send us a WhatsApp message for help with your order.</p>
             <Link className="text-link" href="/shop">Browse the collection <ArrowUpRight size={15} /></Link>
           </div>
           <div className="contact-faq">
             <span className="eyebrow">A few questions</span>
             <details>
               <summary>How do I place an order?</summary>
-              <p>Add products to your enquiry basket and send the summary on WhatsApp at {siteConfig.whatsappDisplay}. We’ll confirm availability, pack sizes and pricing with you.</p>
+              <p>Use Add to Cart and checkout for available products, or contact us on WhatsApp at {siteConfig.whatsappDisplay} for assistance.</p>
             </details>
             <details>
               <summary>Where do you deliver?</summary>
-              <p>We are based in Hyderabad. Delivery coverage and timings are confirmed when you enquire.</p>
+              <p>We are based in Hyderabad. We currently serve selected local PIN codes. Enter your PIN at checkout to check delivery availability.</p>
             </details>
             <details>
               <summary>Do you have a menu of prices?</summary>
@@ -75,7 +75,7 @@ export default function ContactPage() {
             </details>
             <details>
               <summary>What about payment?</summary>
-              <p>No payment is processed on this website. Payment options are confirmed with your order on WhatsApp.</p>
+              <p>Available products can be paid for securely through the website checkout. For WhatsApp orders, we will confirm the payment method directly with you.</p>
             </details>
           </div>
         </aside>

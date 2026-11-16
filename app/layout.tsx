@@ -4,6 +4,7 @@ import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { CartProvider } from "@/components/cart-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { WhatsAppFloat } from "@/components/whatsapp-float";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <SiteHeader />
           <main>{children}</main>
           <SiteFooter />
+          <WhatsAppFloat />
         </CartProvider>
       </body>
     </html>

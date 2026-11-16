@@ -35,7 +35,7 @@ export async function checkServiceability(q: Queryable, settings: DeliverySettin
   return { serviceable: true, label: match.label, feeOverridePaise: match.delivery_fee_paise };
 }
 
-export function deliveryFeeFor(settings: DeliverySettings, area: { feeOverridePaise: number | null }, subtotalPaise: number): number {
-  if (settings.freeThresholdPaise !== null && subtotalPaise >= settings.freeThresholdPaise) return 0;
-  return area.feeOverridePaise ?? settings.feePaise;
+/** Fixed launch pricing: ₹100 below ₹999; ₹50 from ₹999. */
+export function deliveryFeeFor(_settings: DeliverySettings, _area: { feeOverridePaise: number | null }, subtotalPaise: number): number {
+  return subtotalPaise >= 99_900 ? 5_000 : 10_000;
 }

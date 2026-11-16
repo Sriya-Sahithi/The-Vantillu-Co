@@ -5,7 +5,7 @@ export const siteConfig = {
   registeredBusinessName: "Inti Ruchulu",
   description:
     "The Modern Millennial Kitchen — traditional homemade chocolates, podis, healthy sweets and cookies, made fresh in small batches in Hyderabad.",
-  announcement: "Traditional homemade goodness · Made fresh in small batches in Hyderabad · Order online or on WhatsApp",
+  announcement: "Homemade goodness · Shop online or order on WhatsApp",
   craftedBy: "Sriya",
   location: "Hyderabad, India",
   email: "",

@@ -19,7 +19,7 @@ export default async function HomePage() {
         <div className="hero-copy">
           <span className="eyebrow"><span className="eyebrow-dot" /> {siteConfig.tagline}</span>
           <h1>Traditional roots,<br /><em>modern soul.</em></h1>
-          <p>Homemade chocolates, traditional podis, healthy sweets and cookies — handcrafted fresh in small batches in Hyderabad.</p>
+          <p>Homemade chocolates, traditional podis, healthy sweets and cookies — made in small batches with care.</p>
           <div className="hero-pills">
             <span className="hero-pill">🌱 100% Homemade</span>
             <span className="hero-pill">✨ Small Batch Fresh</span>
@@ -29,7 +29,7 @@ export default async function HomePage() {
             <Link className="button button-primary" href="/shop">Explore our collection <ArrowRight size={17} /></Link>
             <Link className="text-link" href="/story">Our brand story <ArrowUpRight size={16} /></Link>
           </div>
-          <div className="hero-footnote"><span>01 / 04 Categories</span><span className="hero-rule" /><span>Order on WhatsApp</span></div>
+          <div className="hero-footnote"><span>14 Products · 4 Collections</span><span className="hero-rule" /><span>Shop online or order on WhatsApp</span></div>
         </div>
         <div className="hero-image-wrap">
           <div className="hero-image-frame">
@@ -84,7 +84,7 @@ export default async function HomePage() {
           </div>
           <Link className="text-link" href="/shop">Meet the whole catalogue <ArrowUpRight size={16} /></Link>
         </div>
-        <p className="placeholder-note">Each batch is freshly made upon enquiry. Connect directly on WhatsApp for availability and custom pack sizing.</p>
+        <p className="placeholder-note">Explore all 14 products. Items marked available can be ordered online; message us on WhatsApp for product questions, custom requests and availability.</p>
         <div className="product-grid featured-grid">
           {featured.map((product) => <ProductCard key={product.slug} product={product} />)}
         </div>
@@ -97,11 +97,11 @@ export default async function HomePage() {
         <p>The Vantillu Co. celebrates authentic Indian food culture, presenting traditional homemade staples with clean, modern aesthetics.</p>
         <div className="promise-values">
           <span>100% Homemade</span>
-          <span>Natural Ingredients</span>
-          <span>No Preservatives</span>
+          <span>Thoughtful Ingredients</span>
+          <span>Small-Batch Preparation</span>
           <span>Small Batch Quality</span>
         </div>
-        <p className="promise-disclaimer">Handcrafted with care in Hyderabad · Contact us on WhatsApp for fresh batches.</p>
+        <p className="promise-disclaimer">Browse the collection and choose the ordering method that works for you.</p>
       </section>
 
       <section className="kitchen-section">
@@ -122,8 +122,8 @@ export default async function HomePage() {
       <section className="newsletter-strip">
         <span className="eyebrow">Simple, direct ordering</span>
         <h2>Ready for fresh <em>homemade goodness?</em></h2>
-        <p className="order-strip-desc">Message us directly on WhatsApp to check today&apos;s fresh batches and place your order in Hyderabad.</p>
-        <Link className="button button-primary" href="/contact">Chat with us on WhatsApp <ArrowRight size={16} /></Link>
+        <p className="order-strip-desc">Place an order through our online checkout or message us on WhatsApp for personal assistance.</p>
+        <div className="hero-actions"><Link className="button button-primary" href="/shop">Shop the collection <ArrowRight size={16} /></Link><Link className="text-link" href="/contact">WhatsApp us <ArrowUpRight size={16} /></Link></div>
       </section>
     </>
   );

@@ -34,7 +34,7 @@ Key rules enforced in code:
 - **Guest orders** are reachable only via an HMAC-signed link token or order number + mobile lookup. Order IDs are never enough on their own.
 - **Admin** routes are authorised server-side (role in DB). Every admin order change is written to `audit_log` and `order_status_history`.
 - **RLS** is enabled on every table with no policies, and `anon`/`authenticated` privileges are revoked. All access goes through the server with the `DATABASE_URL` role.
-- **No free-delivery threshold** exists unless the owner sets one in Admin → Delivery. The default delivery fee is ₹0 until configured.
+- **Delivery pricing is tiered on the server:** ₹100 when the product subtotal is below ₹999; ₹50 when the subtotal is ₹999 or more. The fee is added to the Razorpay checkout total. Only owner-configured serviceable PIN codes can check out.
 
 ### Order statuses
 
@@ -101,7 +101,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 - `migrations/001_init.sql`: schema, indexes, constraints, RLS, privilege revokes.
 - `migrations/002_seed_catalogue.sql`: seeds the 14 existing products and 4 categories.
-- `migrations/003_pack_sizes_and_launch_prices.sql`: adds `products.pack_sizes` and sets the owner's launch prices (below). It only fills products that have no price, so it never overwrites later admin edits.
+- `migrations/003_pack_sizes_and_launch_prices.sql`: adds `products.pack_sizes` and sets the owner-provided launch prices (below). It only fills products that have no price, so it never overwrites later admin edits.\n- `migrations/004_local_first_owner_only.sql`: removes the inherited broad Hyderabad PIN-prefix seed and restricts admin roles to owner accounts. The owner must configure the actual local delivery PINs before checkout can accept orders.
 
 Tables: `users`, `customer_profiles`, `addresses`, `categories`, `products`, `product_images`, `orders`, `order_items` (price and description snapshots), `payments`, `refunds`, `order_status_history`, `delivery_settings`, `serviceable_postcodes`, `admin_roles`, `audit_log`, `auth_otps`, `sessions`, `notification_outbox`, `webhook_events`, `rate_limits`.
 
@@ -117,7 +117,7 @@ Pack sizes are enforced on the server: a chocolate order with any other quantity
 
 **Stock is not set by the migration.** Every product still has stock 0 and is unavailable, so nothing can be bought until you enter real stock and tick "Available for sale" in Admin → Products. Chocolates count stock in pieces. Podis count stock in packets.
 
-The default serviceable PIN prefix is `500` and the delivery fee is ₹0 with no free-delivery threshold. Set real values in the admin dashboard before launch.
+No delivery PIN is enabled by default after migration 004. Configure the actual initial serviceable PIN codes in Admin → Delivery before accepting orders. Customer delivery charges are fixed at ₹100 below a ₹999 product subtotal and ₹50 at or above ₹999; postcode-specific fee overrides are not used. Do not enable a broad PIN prefix unless every PIN in that prefix is genuinely serviceable.
 
 Apply migrations with `npm run db:migrate` (needs `DATABASE_URL`). Applied migrations are tracked, so re-running is a no-op.
 

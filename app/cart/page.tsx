@@ -7,6 +7,7 @@ import { useCart } from "@/components/cart-provider";
 import { useQuote } from "@/components/use-quote";
 import { MAX_LINE_QUANTITY } from "@/lib/catalog-types";
 import { formatPaise } from "@/lib/money";
+import { getWhatsAppUrl } from "@/lib/site-config";
 
 export default function CartPage() {
   const { items, hydrated, setQuantity, removeItem } = useCart();
@@ -14,6 +15,16 @@ export default function CartPage() {
   const lineBySlug = new Map(quote?.lines.map((line) => [line.slug, line]));
   const issueBySlug = new Map(quote?.issues.map((issue) => [issue.slug, issue]));
   const canCheckout = Boolean(quote && quote.lines.length > 0 && quote.issues.length === 0);
+  const whatsappMessage = [
+    "Hello The Vantillu Co.! I would like to enquire about this cart:",
+    ...items.map((item) => {
+      const product = lineBySlug.get(item.slug) ?? issueBySlug.get(item.slug);
+      const name = product?.name ?? item.slug.replace(/-/g, " ");
+      return `• ${name} — ${item.quantity}${product && "packSizes" in product && product.packSizes ? " pieces" : " unit(s)"}`;
+    }),
+    "Please confirm availability, final pricing and local delivery options. Thank you!",
+  ].join("\n");
+  const whatsappUrl = getWhatsAppUrl(whatsappMessage);
 
   return (
     <div className="page-shell cart-page">
@@ -84,15 +95,15 @@ export default function CartPage() {
             <span className="eyebrow">Order summary</span>
             <h2>Almost there.</h2>
             <div className="summary-line"><span>Subtotal</span><strong>{formatPaise(quote?.subtotalPaise ?? 0)}</strong></div>
-            <div className="summary-line"><span>Delivery</span><span>Calculated at checkout</span></div>
-            {quote && quote.delivery.defaultFeePaise > 0 ? <p className="placeholder-note">Delivery from {formatPaise(quote.delivery.defaultFeePaise)}, confirmed once you enter your PIN code.</p> : null}
-            {quote?.delivery.freeThresholdPaise ? <p className="placeholder-note">Free delivery on orders of {formatPaise(quote.delivery.freeThresholdPaise)} or more.</p> : null}
+            <div className="summary-line"><span>Delivery</span><span>₹100 / ₹50 by order value</span></div>
+            <p className="placeholder-note">₹100 below ₹999 · ₹50 on orders of ₹999 and above. The exact charge is added at checkout after your PIN code is checked.</p>
             {canCheckout ? (
               <Link className="button button-primary summary-button" href="/checkout">Proceed to checkout <ArrowRight size={16} /></Link>
             ) : (
               <button className="button button-primary summary-button" disabled type="button">Fix the items above to continue</button>
             )}
-            <p className="privacy-note">Prices and availability are confirmed again securely at checkout. Home delivery only.</p>
+            {whatsappUrl ? <a className="button button-outline summary-button" href={whatsappUrl} rel="noreferrer" target="_blank">Enquire about this cart on WhatsApp</a> : null}
+            <p className="privacy-note">Checkout is available for eligible products. WhatsApp enquiries are confirmed personally before an order is accepted.</p>
           </aside>
         </div>
       )}
