@@ -19,7 +19,7 @@ export function ProductDetail({ product, related }: { product: PublicProduct; re
     product.availability === "available" ? (product.stock <= 5 ? `Only ${product.stock} left` : "In stock")
       : product.availability === "out_of_stock" ? "Out of stock"
       : product.availability === "unavailable" ? "Currently unavailable"
-      : "Not yet available to order online — message us on WhatsApp";
+      : "Not yet available to order online";
 
   return (
     <div className="page-shell product-page">
@@ -50,12 +50,19 @@ export function ProductDetail({ product, related }: { product: PublicProduct; re
             </div>
           ) : null}
           <div className="detail-actions">
-            {buyable ? <AddToCartButton quantity={quantity} slug={product.slug} /> : null}
-            {whatsappUrl ? (
-              <a className="button button-whatsapp" href={whatsappUrl} rel="noreferrer" target="_blank">Ask on WhatsApp <ArrowUpRight size={16} /></a>
-            ) : null}
+            {buyable ? (
+              <>
+                <AddToCartButton quantity={quantity} slug={product.slug} />
+                <AddToCartButton goToCheckout label="Buy now" quantity={quantity} slug={product.slug} variant="outline" />
+              </>
+            ) : (
+              <button className="button button-primary add-button" disabled type="button">{product.availability === "out_of_stock" ? "Out of stock" : "Not available to order yet"}</button>
+            )}
           </div>
-          <p className="enquiry-note">{buyable ? "Secure online payment by UPI, cards, net banking and wallets. Home delivery only." : "We’ll confirm availability, pack sizes and pricing on WhatsApp."}</p>
+          <p className="enquiry-note">
+            {buyable ? "Secure online payment by UPI, cards, net banking and wallets. Home delivery only." : "This item can’t be ordered online right now."}
+            {whatsappUrl ? <> Questions? <a className="text-link" href={whatsappUrl} rel="noreferrer" target="_blank">Message us on WhatsApp <ArrowUpRight size={12} /></a></> : null}
+          </p>
           <div className="product-facts">
             <details>
               <summary>Product details</summary>

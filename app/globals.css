@@ -682,3 +682,5 @@ address { font-style: normal; font-size: 14px; line-height: 1.7; }
   .button { padding: 0 14px; }
 }
 .button:focus-visible, .text-button:focus-visible, a:focus-visible { outline: 3px solid var(--brass); outline-offset: 3px; }
+
+.product-card .add-button { width: 100%; margin-top: 12px; min-height: 42px; flex: none; }

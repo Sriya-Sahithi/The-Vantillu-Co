@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { AddToCartButton } from "@/components/add-to-cart-button";
 import type { PublicProduct } from "@/lib/catalog-types";
 import { formatPaise } from "@/lib/money";
 
@@ -9,7 +10,7 @@ export function ProductCard({ product }: { product: PublicProduct }) {
     product.availability === "available" ? product.packLabel
       : product.availability === "out_of_stock" ? "Out of stock"
       : product.availability === "unavailable" ? "Currently unavailable"
-      : "Enquire on WhatsApp";
+      : "Not available to order yet";
 
   return (
     <article className="product-card">
@@ -30,6 +31,7 @@ export function ProductCard({ product }: { product: PublicProduct }) {
           <ArrowUpRight size={18} />
         </Link>
       </div>
+      {product.availability === "available" ? <AddToCartButton slug={product.slug} /> : null}
     </article>
   );
 }
