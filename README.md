@@ -34,7 +34,7 @@ Key rules enforced in code:
 - **Guest orders** are reachable only via an HMAC-signed link token or order number + mobile lookup. Order IDs are never enough on their own.
 - **Admin** routes are authorised server-side (role in DB). Every admin order change is written to `audit_log` and `order_status_history`.
 - **RLS** is enabled on every table with no policies, and `anon`/`authenticated` privileges are revoked. All access goes through the server with the `DATABASE_URL` role.
-- **No free-delivery threshold** exists unless the owner sets one in Admin → Delivery. The default delivery fee is ₹0 until configured.
+- **Delivery pricing is tiered on the server:** ₹100 when the product subtotal is below ₹999; ₹50 when the subtotal is ₹999 or more. The fee is added to the Razorpay checkout total. Only owner-configured serviceable PIN codes can check out.
 
 ### Order statuses
 
@@ -117,7 +117,7 @@ Pack sizes are enforced on the server: a chocolate order with any other quantity
 
 **Stock is not set by the migration.** Every product still has stock 0 and is unavailable, so nothing can be bought until you enter real stock and tick "Available for sale" in Admin → Products. Chocolates count stock in pieces. Podis count stock in packets.
 
-No delivery PIN is enabled by default after migration 004. Configure the actual initial serviceable PIN codes and delivery charges in Admin → Delivery before accepting orders. Do not enable a broad PIN prefix unless every PIN in that prefix is genuinely serviceable.
+No delivery PIN is enabled by default after migration 004. Configure the actual initial serviceable PIN codes in Admin → Delivery before accepting orders. Customer delivery charges are fixed at ₹100 below a ₹999 product subtotal and ₹50 at or above ₹999; postcode-specific fee overrides are not used. Do not enable a broad PIN prefix unless every PIN in that prefix is genuinely serviceable.
 
 Apply migrations with `npm run db:migrate` (needs `DATABASE_URL`). Applied migrations are tracked, so re-running is a no-op.
 
