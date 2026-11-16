@@ -20,6 +20,8 @@ export function SiteFooter() {
           <Link href="/shop">Shop collection</Link>
           <Link href="/story">Our story</Link>
           <Link href="/contact">Contact & orders</Link>
+          <Link href="/track">Track your order</Link>
+          <Link href="/account">My account</Link>
         </div>
         <div>
           <h2>Good to know</h2>

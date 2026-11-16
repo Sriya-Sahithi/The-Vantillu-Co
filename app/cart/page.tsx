@@ -2,100 +2,87 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/components/cart-provider";
-import { formatPrice, getProduct } from "@/lib/products";
-import { getWhatsAppUrl, siteConfig } from "@/lib/site-config";
+import { useQuote } from "@/components/use-quote";
+import { MAX_LINE_QUANTITY } from "@/lib/catalog-types";
+import { formatPaise } from "@/lib/money";
 
 export default function CartPage() {
-  const { items, hydrated, subtotal, updateQuantity, removeItem } = useCart();
-  const hasPricedItems = subtotal > 0;
-  const message = useMemo(() => {
-    const lines = items.flatMap((item) => {
-      const product = getProduct(item.slug);
-      const pack = product?.packSizes.find((size) => size.id === item.packId);
-      if (!product || !pack) return [];
-      const priceNote = pack.price !== undefined ? ` — ${formatPrice(pack.price * item.quantity)}` : "";
-      return [`• ${product.name} — ${pack.label} × ${item.quantity}${priceNote}`];
-    });
-    return [
-      "Hello! I’d like to enquire about this order:",
-      "",
-      ...lines,
-      "",
-      hasPricedItems ? `Noted subtotal: ${formatPrice(subtotal)} (to be confirmed)` : "Please share pack sizes, availability and prices.",
-      "Delivery: Hyderabad — charges to be confirmed",
-      "Please confirm product availability, pack sizes, final prices and delivery details. This is an enquiry, not a confirmed order.",
-    ].join("\n");
-  }, [hasPricedItems, items, subtotal]);
-  const whatsappUrl = items.length ? getWhatsAppUrl(message) : null;
+  const { items, hydrated, setQuantity, removeItem } = useCart();
+  const { quote, loading, error, refresh } = useQuote(items, hydrated, null);
+  const lineBySlug = new Map(quote?.lines.map((line) => [line.slug, line]));
+  const issueBySlug = new Map(quote?.issues.map((issue) => [issue.slug, issue]));
+  const canCheckout = Boolean(quote && quote.lines.length > 0 && quote.issues.length === 0);
 
   return (
     <div className="page-shell cart-page">
       <div className="cart-heading">
-        <span className="eyebrow">A little something for later</span>
-        <h1>Your <em>enquiry basket.</em></h1>
-        <p>Gather what you’d like. We’ll confirm pack sizes, prices and delivery on WhatsApp. Nothing is paid for here.</p>
+        <span className="eyebrow">Your selection</span>
+        <h1>Your <em>cart.</em></h1>
+        <p>Review your items, then continue to secure checkout. You don’t need an account.</p>
       </div>
-      {!hydrated ? (
-        <div aria-live="polite" className="cart-loading">Loading your saved enquiry…</div>
+      {!hydrated || (loading && !quote && items.length > 0) ? (
+        <div aria-live="polite" className="cart-loading" role="status"><span className="spinner" aria-hidden="true" /> Loading your cart…</div>
       ) : items.length === 0 ? (
         <div className="empty-cart">
           <span className="empty-cart-mark" aria-hidden="true">
-            <Image alt="The Vantillu Co. circular brand seal" height={72} src="/brand/kitchen-seal.webp" width={72} />
+            <Image alt="" height={72} src="/brand/kitchen-seal.webp" width={72} />
           </span>
-          <h2>Your basket is waiting for a little something.</h2>
-          <p>Take a look around and add anything you’d like to enquire about.</p>
+          <h2>Your cart is waiting for a little something.</h2>
+          <p>Take a look around and add something homemade.</p>
           <Link className="button button-primary" href="/shop">Explore the shop <ArrowRight size={16} /></Link>
+        </div>
+      ) : error ? (
+        <div className="notice notice-error" role="alert">
+          <p>{error}</p>
+          <button className="button button-outline" onClick={refresh} type="button">Try again</button>
         </div>
       ) : (
         <div className="cart-layout">
           <div className="cart-items">
             {items.map((item) => {
-              const product = getProduct(item.slug);
-              const pack = product?.packSizes.find((size) => size.id === item.packId);
-              if (!product || !pack) return null;
+              const line = lineBySlug.get(item.slug);
+              const issue = issueBySlug.get(item.slug);
+              const name = line?.name ?? issue?.name ?? item.slug.replace(/-/g, " ");
               return (
-                <article className="cart-item" key={`${item.slug}-${item.packId}`}>
-                  <Link className="cart-item-image" href={`/product/${product.slug}`}>
-                    <Image alt={product.imageAlt} fill sizes="120px" src={product.image} />
+                <article className="cart-item" key={item.slug}>
+                  <Link className="cart-item-image" href={`/product/${item.slug}`}>
+                    {line?.image || issue?.image ? <Image alt="" fill sizes="120px" src={(line?.image ?? issue?.image) as string} /> : null}
                   </Link>
                   <div className="cart-item-copy">
-                    <Link className="product-name" href={`/product/${product.slug}`}>{product.name}</Link>
-                    <p>{pack.label}</p>
-                    <span className="cart-unit-price">{pack.price !== undefined ? formatPrice(pack.price) : "Price on enquiry"}</span>
+                    <Link className="product-name" href={`/product/${item.slug}`}>{name}</Link>
+                    {line ? <p>{line.packLabel}</p> : null}
+                    {line ? <span className="cart-unit-price">{formatPaise(line.unitPricePaise)} each</span> : null}
+                    {issue ? <p className="cart-issue" role="alert"><AlertTriangle size={13} aria-hidden="true" /> {issue.message}</p> : null}
                   </div>
                   <div className="cart-item-controls">
-                    <div aria-label={`Quantity for ${product.name}`} className="quantity-control">
-                      <button aria-label={`Decrease ${product.name} quantity`} disabled={item.quantity <= 1} onClick={() => updateQuantity(item.slug, item.packId, item.quantity - 1)} type="button"><Minus size={14} /></button>
+                    <div aria-label={`Quantity for ${name}`} className="quantity-control" role="group">
+                      <button aria-label="Decrease quantity" disabled={item.quantity <= 1} onClick={() => setQuantity(item.slug, item.quantity - 1)} type="button"><Minus size={14} /></button>
                       <span>{item.quantity}</span>
-                      <button aria-label={`Increase ${product.name} quantity`} onClick={() => updateQuantity(item.slug, item.packId, item.quantity + 1)} type="button"><Plus size={14} /></button>
+                      <button aria-label="Increase quantity" disabled={item.quantity >= Math.min(MAX_LINE_QUANTITY, line?.stock ?? MAX_LINE_QUANTITY)} onClick={() => setQuantity(item.slug, item.quantity + 1)} type="button"><Plus size={14} /></button>
                     </div>
-                    <strong>{pack.price !== undefined ? formatPrice(pack.price * item.quantity) : `× ${item.quantity}`}</strong>
-                    <button aria-label={`Remove ${product.name} from enquiry`} className="remove-item" onClick={() => removeItem(item.slug, item.packId)} type="button"><Trash2 size={16} /> Remove</button>
+                    <strong>{line ? formatPaise(line.lineTotalPaise) : "—"}</strong>
+                    <button aria-label={`Remove ${name} from cart`} className="remove-item" onClick={() => removeItem(item.slug)} type="button"><Trash2 size={16} /> Remove</button>
                   </div>
                 </article>
               );
             })}
-            <Link className="continue-shopping" href="/shop"><ArrowLeft size={15} /> Continue browsing</Link>
+            <Link className="continue-shopping" href="/shop"><ArrowLeft size={15} /> Continue shopping</Link>
           </div>
-          <aside className="order-summary">
-            <span className="eyebrow">Your summary</span>
-            <h2>Just a note, not an order.</h2>
-            {hasPricedItems ? (
-              <div className="summary-line"><span>Noted subtotal</span><strong>{formatPrice(subtotal)}</strong></div>
+          <aside aria-busy={loading} className="order-summary">
+            <span className="eyebrow">Order summary</span>
+            <h2>Almost there.</h2>
+            <div className="summary-line"><span>Subtotal</span><strong>{formatPaise(quote?.subtotalPaise ?? 0)}</strong></div>
+            <div className="summary-line"><span>Delivery</span><span>Calculated at checkout</span></div>
+            {quote && quote.delivery.defaultFeePaise > 0 ? <p className="placeholder-note">Delivery from {formatPaise(quote.delivery.defaultFeePaise)}, confirmed once you enter your PIN code.</p> : null}
+            {quote?.delivery.freeThresholdPaise ? <p className="placeholder-note">Free delivery on orders of {formatPaise(quote.delivery.freeThresholdPaise)} or more.</p> : null}
+            {canCheckout ? (
+              <Link className="button button-primary summary-button" href="/checkout">Proceed to checkout <ArrowRight size={16} /></Link>
             ) : (
-              <div className="summary-line"><span>Pricing</span><span>Shared on WhatsApp</span></div>
+              <button className="button button-primary summary-button" disabled type="button">Fix the items above to continue</button>
             )}
-            <div className="summary-line"><span>Delivery</span><span>{siteConfig.location}</span></div>
-            <p className="placeholder-note">Pack sizes and prices are confirmed when you message us. No payment is collected on this website.</p>
-            {whatsappUrl ? (
-              <a className="button button-primary summary-button" href={whatsappUrl} rel="noreferrer" target="_blank">Send enquiry on WhatsApp <ArrowRight size={16} /></a>
-            ) : (
-              <p className="config-hint">WhatsApp ordering is not configured yet. Add the business number to the environment settings.</p>
-            )}
-            <p className="privacy-note">The message opens WhatsApp with an enquiry summary. No order is accepted and no payment is collected on this website.</p>
+            <p className="privacy-note">Prices and availability are confirmed again securely at checkout. Home delivery only.</p>
           </aside>
         </div>
       )}

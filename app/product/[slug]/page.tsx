@@ -1,20 +1,18 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/product-detail";
-import { getProduct, products } from "@/lib/products";
+import { findProduct, listProducts } from "@/lib/server/catalog";
 import { siteConfig } from "@/lib/site-config";
 
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
-}
+export const revalidate = 30;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const product = await findProduct(slug);
   if (!product) return { title: "Product not found" };
   return {
     title: `${product.name} — homemade from The Vantillu Co.`,
-    description: `${product.description} Enquire on WhatsApp +91 9441343257.`,
+    description: product.description,
     alternates: { canonical: `/product/${product.slug}` },
     openGraph: {
       title: `${product.name} | The Vantillu Co.`,
@@ -27,7 +25,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const [product, all] = await Promise.all([findProduct(slug), listProducts()]);
   if (!product) notFound();
-  return <ProductDetail product={product} />;
+  const related = all.filter((item) => item.slug !== product.slug && item.category === product.category).slice(0, 3);
+  return <ProductDetail product={product} related={related} />;
 }

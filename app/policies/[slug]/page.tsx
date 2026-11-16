@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 const policies: Record<string, { title: string; description: string }> = {
   shipping: {
     title: "Shipping & delivery",
-    description: "Delivery coverage, charges, dispatch estimates and delivery timings must be confirmed by the business before this draft is replaced with the final policy.",
+    description: "We deliver to your home only, within the PIN-code areas we currently serve. Delivery charges are shown at checkout before you pay. Dispatch estimates and delivery timings must be confirmed by the business before this draft is replaced with the final policy.",
   },
   returns: {
     title: "Returns, refunds & cancellations",
@@ -13,7 +13,7 @@ const policies: Record<string, { title: string; description: string }> = {
   },
   privacy: {
     title: "Privacy",
-    description: "This website stores the enquiry basket in your browser only. The contact form opens your email application when configured and does not submit information to a server. Add the final privacy notice and any third-party service details before launch.",
+    description: "Your cart is saved in your browser. When you place an order we store your name, mobile number, optional email, delivery address and order details so we can fulfil and support it. Card, UPI and net-banking details are entered on Razorpay’s secure checkout and are never stored by us. If you sign in, we store your email, profile and saved addresses. Order emails are sent through an email service provider. The business must add its final privacy notice, retention period and contact details before launch.",
   },
   terms: {
     title: "Terms of use",

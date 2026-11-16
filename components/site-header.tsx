@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { useCart } from "@/components/cart-provider";
 import { siteConfig } from "@/lib/site-config";
@@ -12,6 +12,7 @@ const links = [
   { href: "/shop", label: "Shop" },
   { href: "/story", label: "Our story" },
   { href: "/contact", label: "Contact" },
+  { href: "/track", label: "Track order" },
 ];
 
 export function SiteHeader() {
@@ -46,7 +47,10 @@ export function SiteHeader() {
             <Link aria-label="Search products" className="icon-button" href="/shop?focus=search">
               <Search size={20} strokeWidth={1.7} />
             </Link>
-            <Link aria-label={`Shopping enquiry, ${count} items`} className="icon-button cart-link" href="/cart">
+            <Link aria-label="My account" className="icon-button" href="/account">
+              <User size={20} strokeWidth={1.7} />
+            </Link>
+            <Link aria-label={`Shopping cart, ${count} ${count === 1 ? "item" : "items"}`} className="icon-button cart-link" href="/cart">
               <ShoppingBag size={20} strokeWidth={1.7} />
               <span className="cart-count">{count}</span>
             </Link>
