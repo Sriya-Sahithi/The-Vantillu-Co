@@ -278,20 +278,15 @@ export async function adminGetDelivery() {
   const [{ rows: s }, { rows: p }] = await Promise.all([db.query(`select * from delivery_settings where id = 1`), db.query(`select * from serviceable_postcodes order by pattern`)]);
   return {
     enabled: s[0].delivery_enabled as boolean,
-    feePaise: s[0].delivery_fee_paise as number,
-    freeThresholdPaise: (s[0].free_delivery_threshold_paise as number | null) ?? null,
+    feePaise: 10_000,
+    freeThresholdPaise: 99_900,
     postcodes: p.map((r: Row) => ({ pattern: r.pattern as string, label: r.label as string, enabled: r.enabled as boolean, feePaise: (r.delivery_fee_paise as number | null) ?? null })),
   };
 }
 
 export async function adminUpdateDelivery(adminId: string, body: Record<string, unknown>) {
-  const fee = rupeesToPaise(body.fee as string | number);
-  if (fee === null || fee > 1_000_000) throw badRequest("Enter a valid delivery charge in rupees (0 is allowed).");
-  let threshold: number | null = null;
-  if (body.freeThreshold !== null && body.freeThreshold !== "" && body.freeThreshold !== undefined) {
-    threshold = rupeesToPaise(body.freeThreshold as string | number);
-    if (threshold === null || threshold === 0) throw badRequest("Free-delivery threshold must be a positive amount, or left empty to disable it.");
-  }
+  const fee = 10_000;
+  const threshold = 99_900;
   const db = getDb();
   await db.query(`update delivery_settings set delivery_enabled = $1, delivery_fee_paise = $2, free_delivery_threshold_paise = $3, updated_at = now() where id = 1`, [body.enabled === true, fee, threshold]);
   await audit(db, adminId, "delivery.settings", "delivery_settings", "1", { enabled: body.enabled === true, fee, threshold });
@@ -300,11 +295,8 @@ export async function adminUpdateDelivery(adminId: string, body: Record<string, 
 export async function adminUpsertPostcode(adminId: string, body: Record<string, unknown>) {
   const pattern = typeof body.pattern === "string" ? body.pattern.trim() : "";
   if (!/^[1-9]\d{2,5}$/.test(pattern)) throw badRequest("Enter a 3 to 6 digit PIN code or PIN prefix (e.g. 500 or 500081).");
-  let fee: number | null = null;
-  if (body.fee !== null && body.fee !== "" && body.fee !== undefined) {
-    fee = rupeesToPaise(body.fee as string | number);
-    if (fee === null) throw badRequest("Enter a valid charge, or leave empty to use the default.");
-  }
+  // Launch delivery pricing is fixed by order subtotal; postcode-specific fee overrides are disabled.
+  const fee: number | null = null;
   const db = getDb();
   await db.query(
     `insert into serviceable_postcodes (pattern, label, enabled, delivery_fee_paise) values ($1,$2,$3,$4)
