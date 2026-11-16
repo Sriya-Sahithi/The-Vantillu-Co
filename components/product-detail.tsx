@@ -11,15 +11,17 @@ import { formatPaise } from "@/lib/money";
 import { getWhatsAppUrl } from "@/lib/site-config";
 
 export function ProductDetail({ product, related }: { product: PublicProduct; related: PublicProduct[] }) {
-  const [quantity, setQuantity] = useState(1);
+  const packs = product.packSizes;
   const buyable = product.availability === "available";
+  const availablePacks = packs ? packs.filter((n) => n <= product.stock) : [];
+  const [quantity, setQuantity] = useState(packs ? (availablePacks[0] ?? packs[0]) : 1);
   const maxQuantity = buyable ? Math.min(MAX_LINE_QUANTITY, product.stock) : 1;
   const whatsappUrl = getWhatsAppUrl(`Hello! I’d like to ask about ${product.name}${buyable ? `, quantity ${quantity}` : ""}. Please let me know availability and pack sizes.`);
   const statusText =
     product.availability === "available" ? (product.stock <= 5 ? `Only ${product.stock} left` : "In stock")
       : product.availability === "out_of_stock" ? "Out of stock"
       : product.availability === "unavailable" ? "Currently unavailable"
-      : "Not yet available to order online — message us on WhatsApp";
+      : "Not yet available to order online";
 
   return (
     <div className="page-shell product-page">
@@ -35,11 +37,28 @@ export function ProductDetail({ product, related }: { product: PublicProduct; re
           <h1>{product.name}</h1>
           <p className="detail-price">
             {product.pricePaise !== null ? formatPaise(product.pricePaise) : "Price on enquiry"}
-            {product.packLabel && product.pricePaise !== null ? <span> · {product.packLabel}</span> : null}
+            {product.packLabel && product.pricePaise !== null ? <span> {packs ? "" : "· "}{product.packLabel}</span> : null}
           </p>
           <p className="detail-stock" role="status">{statusText}</p>
           <p className="detail-description">{product.description}</p>
-          {buyable ? (
+          {buyable && packs ? (
+            <div className="detail-field">
+              <span className="field-label" id="pack-label">Choose a pack</span>
+              <div aria-labelledby="pack-label" className="pack-options" role="radiogroup">
+                {packs.map((n) => {
+                  const ok = n <= product.stock;
+                  return (
+                    <button aria-checked={quantity === n} className={`pack-option${quantity === n ? " selected" : ""}`} disabled={!ok} key={n} onClick={() => setQuantity(n)} role="radio" type="button">
+                      <strong>{n} pieces</strong>
+                      <span>{formatPaise((product.pricePaise ?? 0) * n)}</span>
+                      {!ok ? <small>Not enough stock</small> : null}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="pack-total" role="status">{quantity} × {formatPaise(product.pricePaise ?? 0)} = <strong>{formatPaise((product.pricePaise ?? 0) * quantity)}</strong></p>
+            </div>
+          ) : buyable ? (
             <div className="detail-field">
               <label id="qty-label">Quantity</label>
               <div aria-labelledby="qty-label" className="quantity-control" role="group">
@@ -50,12 +69,19 @@ export function ProductDetail({ product, related }: { product: PublicProduct; re
             </div>
           ) : null}
           <div className="detail-actions">
-            {buyable ? <AddToCartButton quantity={quantity} slug={product.slug} /> : null}
-            {whatsappUrl ? (
-              <a className="button button-whatsapp" href={whatsappUrl} rel="noreferrer" target="_blank">Ask on WhatsApp <ArrowUpRight size={16} /></a>
-            ) : null}
+            {buyable ? (
+              <>
+                <AddToCartButton disabled={packs ? !availablePacks.includes(quantity) : false} quantity={quantity} replace={Boolean(packs)} slug={product.slug} />
+                <AddToCartButton disabled={packs ? !availablePacks.includes(quantity) : false} goToCheckout label="Buy now" quantity={quantity} replace={Boolean(packs)} slug={product.slug} variant="outline" />
+              </>
+            ) : (
+              <button className="button button-primary add-button" disabled type="button">{product.availability === "out_of_stock" ? "Out of stock" : "Not available to order yet"}</button>
+            )}
           </div>
-          <p className="enquiry-note">{buyable ? "Secure online payment by UPI, cards, net banking and wallets. Home delivery only." : "We’ll confirm availability, pack sizes and pricing on WhatsApp."}</p>
+          <p className="enquiry-note">
+            {buyable ? "Secure online payment by UPI, cards, net banking and wallets. Home delivery only." : "This item can’t be ordered online right now."}
+            {whatsappUrl ? <> Questions? <a className="text-link" href={whatsappUrl} rel="noreferrer" target="_blank">Message us on WhatsApp <ArrowUpRight size={12} /></a></> : null}
+          </p>
           <div className="product-facts">
             <details>
               <summary>Product details</summary>

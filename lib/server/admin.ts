@@ -192,6 +192,15 @@ function parseProduct(body: ProductInput, partial: boolean) {
     }
   }
   if (has("packLabel")) out.pack_label = cleanText(body.packLabel, 60);
+  if (has("packSizes")) {
+    const raw = body.packSizes;
+    if (raw === null || raw === "" || (Array.isArray(raw) && raw.length === 0)) out.pack_sizes = null;
+    else {
+      const list = (Array.isArray(raw) ? raw : String(raw).split(",")).map((v) => (typeof v === "string" ? v.trim() : v)).map(Number);
+      if (list.length > 12 || list.some((n) => !Number.isInteger(n) || n < 1 || n > 1000)) throw badRequest("Pack sizes must be whole numbers like 5, 10, 20, 50, 100.");
+      out.pack_sizes = [...new Set(list)].sort((a, b) => a - b);
+    }
+  }
   if (has("stock")) {
     if (!Number.isInteger(body.stock) || (body.stock as number) < 0 || (body.stock as number) > 100_000) throw badRequest("Stock must be a whole number, 0 or more.");
     out.stock = body.stock;
@@ -243,7 +252,7 @@ export async function adminListProducts() {
   const { rows } = await getDb().query(`select p.*, c.name as category_name from products p join categories c on c.id = p.category_id order by (p.archived_at is not null), p.sort_order, p.name`);
   return rows.map((r) => ({
     id: r.id, slug: r.slug, name: r.name, categoryId: r.category_id, categoryName: r.category_name, description: r.description,
-    imageUrl: r.image_url, imageAlt: r.image_alt, pricePaise: r.price_paise, packLabel: r.pack_label, stock: r.stock,
+    imageUrl: r.image_url, imageAlt: r.image_alt, pricePaise: r.price_paise, packLabel: r.pack_label, packSizes: Array.isArray(r.pack_sizes) ? r.pack_sizes.map(Number) : null, stock: r.stock,
     isAvailable: r.is_available, archived: Boolean(r.archived_at), ingredients: r.ingredients, allergens: r.allergens,
     netQuantity: r.net_quantity, shelfLife: r.shelf_life, storage: r.storage,
   }));

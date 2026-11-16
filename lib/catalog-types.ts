@@ -11,6 +11,8 @@ export type PublicProduct = {
   /** null = no online price yet (enquiry only). */
   pricePaise: number | null;
   packLabel: string | null;
+  /** null = sold singly. Otherwise quantity (pieces) must be exactly one of these. */
+  packSizes: number[] | null;
   stock: number;
   availability: Availability;
   ingredients: string | null;
@@ -22,7 +24,10 @@ export type PublicProduct = {
 
 export type PublicCategory = { id: string; name: string; description: string; image: string };
 
+/** Max units of a product sold singly. */
 export const MAX_LINE_QUANTITY = 20;
+/** Hard ceiling for any cart line (largest pack). Per-product rules are enforced on the server. */
+export const MAX_CART_QUANTITY = 100;
 
 export function isPurchasable(product: Pick<PublicProduct, "availability">): boolean {
   return product.availability === "available";

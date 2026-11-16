@@ -682,3 +682,18 @@ address { font-style: normal; font-size: 14px; line-height: 1.7; }
   .button { padding: 0 14px; }
 }
 .button:focus-visible, .text-button:focus-visible, a:focus-visible { outline: 3px solid var(--brass); outline-offset: 3px; }
+
+.product-card .add-button { width: 100%; margin-top: 12px; min-height: 42px; flex: none; }
+
+.pack-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; margin-top: 8px; }
+.pack-option { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; padding: 10px 12px; border: 1px solid #c9bfae; border-radius: 10px; background: #fffdf8; color: var(--ink); text-align: left; cursor: pointer; font: inherit; }
+.pack-option strong { font-size: 13px; }
+.pack-option span { font-size: 12px; color: var(--muted); }
+.pack-option small { font-size: 10px; color: #a0392c; }
+.pack-option.selected { border-color: var(--green); box-shadow: 0 0 0 2px rgba(63, 86, 53, .22); background: #f4f1e6; }
+.pack-option:disabled { opacity: .5; cursor: not-allowed; }
+.pack-option:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.pack-total { margin: 10px 0 0; font-size: 13px; }
+.pack-select { min-width: 140px; }
+.pack-select select { min-height: 40px; }
+.field-label { display: block; font-size: 12px; font-weight: 600; }

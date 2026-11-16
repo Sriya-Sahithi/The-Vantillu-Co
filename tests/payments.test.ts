@@ -53,7 +53,7 @@ describe("order creation (server-trusted pricing)", () => {
   });
 
   it("rejects enquiry-only (no price), unavailable, out-of-stock and over-stock lines", async () => {
-    await expect(place([{ slug: "milk-chocolate", quantity: 1 }])).rejects.toThrow(/not available for online ordering/);
+    await expect(place([{ slug: "cashew-laddu", quantity: 1 }])).rejects.toThrow(/not available for online ordering/);
     await seedProduct(db, "peanut-laddu", 10000, 5, false);
     await expect(place([{ slug: "peanut-laddu", quantity: 1 }])).rejects.toThrow(/unavailable/);
     await seedProduct(db, "cashew-laddu", 10000, 0);
@@ -296,5 +296,57 @@ describe("refund tracking", () => {
     const admin = (await db.query(`insert into users (email) values ('a@x.com') returning id`)).rows[0].id;
     await refund(admin, s.orderNumber, "x");
     expect((await adminStats(getDb())).revenue_paise).toBe(0);
+  });
+});
+
+describe("launch pricing and pack sizes (migration 003)", () => {
+  const fresh = async () => {
+    // Re-create the DB from migrations only: this is what the owner's database looks like after `npm run db:migrate`.
+    const clean = await createTestDb();
+    await clean.query(`update products set stock = 500, is_available = true where category_id in ('chocolates','podis')`);
+    await clean.query(`update delivery_settings set delivery_fee_paise = 6000`);
+    return clean;
+  };
+
+  it("migration sets podis to Rs 150 per 250 g and chocolates to Rs 10 per piece in packs of 5/10/20/50/100", async () => {
+    const clean = await fresh();
+    const podi = (await clean.query(`select price_paise, pack_label, pack_sizes from products where slug = 'kandi-podi'`)).rows[0];
+    expect(podi).toMatchObject({ price_paise: 15000, pack_label: "250 g", pack_sizes: null });
+    for (const slug of ["dark-chocolate", "milk-chocolate", "white-chocolate"]) {
+      const row = (await clean.query(`select price_paise, pack_label, pack_sizes from products where slug = $1`, [slug])).rows[0];
+      expect(row).toMatchObject({ price_paise: 1000, pack_label: "per piece" });
+      expect(row.pack_sizes).toEqual([5, 10, 20, 50, 100]);
+    }
+    // laddus and cookies were not given a price
+    expect((await clean.query(`select price_paise from products where slug = 'cashew-laddu'`)).rows[0].price_paise).toBeNull();
+  });
+
+  it("prices every chocolate pack on the server: pieces x Rs 10 + delivery", async () => {
+    await fresh();
+    for (const [pieces, total] of [[5, 5000], [10, 10000], [20, 20000], [50, 50000], [100, 100000]] as const) {
+      const s = await place([{ slug: "dark-chocolate", quantity: pieces }]);
+      expect(s.totalPaise).toBe(total + 6000);
+    }
+  });
+
+  it("rejects quantities that are not an allowed chocolate pack", async () => {
+    await fresh();
+    for (const q of [1, 4, 6, 15, 99, 101]) {
+      await expect(place([{ slug: "milk-chocolate", quantity: q }])).rejects.toThrow(/sold in packs of 5, 10, 20, 50, 100/);
+    }
+  });
+
+  it("podis are sold singly at Rs 150 each", async () => {
+    await fresh();
+    const s = await place([{ slug: "kandi-podi", quantity: 3 }]);
+    expect(s.totalPaise).toBe(3 * 15000 + 6000);
+    await expect(place([{ slug: "kandi-podi", quantity: 21 }])).rejects.toThrow(/up to 20/);
+  });
+
+  it("a pack that exceeds remaining stock is refused", async () => {
+    const clean = await fresh();
+    await clean.query(`update products set stock = 30 where slug = 'white-chocolate'`);
+    await expect(place([{ slug: "white-chocolate", quantity: 50 }])).rejects.toThrow(/Only 30/);
+    await expect(place([{ slug: "white-chocolate", quantity: 20 }])).resolves.toBeDefined();
   });
 });

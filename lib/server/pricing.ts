@@ -13,6 +13,7 @@ export type PricedLine = {
   description: string;
   image: string;
   packLabel: string | null;
+  packSizes: number[] | null;
   unitPricePaise: number;
   quantity: number;
   lineTotalPaise: number;
@@ -20,7 +21,7 @@ export type PricedLine = {
   stock: number;
 };
 
-export type CartIssue = { slug: string; name?: string; image?: string; code: "not_found" | "unavailable" | "no_price" | "out_of_stock" | "insufficient_stock" | "bad_quantity"; message: string; available?: number };
+export type CartIssue = { slug: string; name?: string; image?: string; code: "not_found" | "unavailable" | "no_price" | "out_of_stock" | "insufficient_stock" | "bad_quantity"; message: string; available?: number; packSizes?: number[] | null };
 
 export type Quote = {
   lines: PricedLine[];
@@ -54,7 +55,7 @@ export function normalizeCart(raw: unknown): CartInput {
 export async function priceCart(q: Queryable, cart: CartInput, pincode?: string | null, options: { lock?: boolean } = {}): Promise<Quote> {
   const slugs = cart.map((c) => c.slug);
   const { rows } = await q.query(
-    `select id, slug, name, description, image_url, pack_label, price_paise, stock, is_available
+    `select id, slug, name, description, image_url, pack_label, pack_sizes, price_paise, stock, is_available
      from products where slug = any($1) and archived_at is null ${options.lock ? "order by id for update" : ""}`,
     [slugs],
   );
@@ -66,10 +67,6 @@ export async function priceCart(q: Queryable, cart: CartInput, pincode?: string 
     const row = bySlug.get(item.slug);
     if (!row) {
       issues.push({ slug: item.slug, code: "not_found", message: "This product is no longer available." });
-      continue;
-    }
-    if (item.quantity > MAX_LINE_QUANTITY) {
-      issues.push({ slug: item.slug, name: row.name, image: row.image_url, code: "bad_quantity", message: `${row.name}: you can order up to ${MAX_LINE_QUANTITY} at a time.` });
       continue;
     }
     const availability = computeAvailability({ pricePaise: row.price_paise, isAvailable: row.is_available, stock: row.stock });
@@ -85,6 +82,16 @@ export async function priceCart(q: Queryable, cart: CartInput, pincode?: string 
       issues.push({ slug: item.slug, name: row.name, image: row.image_url, code: "out_of_stock", message: `${row.name} is out of stock.`, available: 0 });
       continue;
     }
+    const packSizes: number[] | null = Array.isArray(row.pack_sizes) ? row.pack_sizes.map(Number) : null;
+    if (packSizes) {
+      if (!packSizes.includes(item.quantity)) {
+        issues.push({ slug: item.slug, name: row.name, image: row.image_url, code: "bad_quantity", packSizes, message: `${row.name} is sold in packs of ${packSizes.join(", ")}. Please choose a pack size.` });
+        continue;
+      }
+    } else if (item.quantity > MAX_LINE_QUANTITY) {
+      issues.push({ slug: item.slug, name: row.name, image: row.image_url, code: "bad_quantity", message: `${row.name}: you can order up to ${MAX_LINE_QUANTITY} at a time.` });
+      continue;
+    }
     if (item.quantity > row.stock) {
       issues.push({ slug: item.slug, name: row.name, image: row.image_url, code: "insufficient_stock", message: `Only ${row.stock} of ${row.name} left.`, available: row.stock });
       continue;
@@ -96,6 +103,7 @@ export async function priceCart(q: Queryable, cart: CartInput, pincode?: string 
       description: row.description,
       image: row.image_url,
       packLabel: row.pack_label,
+      packSizes,
       unitPricePaise: row.price_paise,
       quantity: item.quantity,
       lineTotalPaise: row.price_paise * item.quantity,

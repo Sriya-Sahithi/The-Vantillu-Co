@@ -52,16 +52,26 @@ export default function CartPage() {
                   </Link>
                   <div className="cart-item-copy">
                     <Link className="product-name" href={`/product/${item.slug}`}>{name}</Link>
-                    {line ? <p>{line.packLabel}</p> : null}
-                    {line ? <span className="cart-unit-price">{formatPaise(line.unitPricePaise)} each</span> : null}
+                    {line && !line.packSizes ? <p>{line.packLabel}</p> : null}
+                    {line ? <span className="cart-unit-price">{formatPaise(line.unitPricePaise)} {line.packSizes ? "per piece" : "each"}{line.packSizes ? ` · ${item.quantity} pieces` : ""}</span> : null}
                     {issue ? <p className="cart-issue" role="alert"><AlertTriangle size={13} aria-hidden="true" /> {issue.message}</p> : null}
                   </div>
                   <div className="cart-item-controls">
+                    {(line?.packSizes ?? issue?.packSizes) ? (
+                      <div className="form-field pack-select">
+                        <label htmlFor={`pack-${item.slug}`}>Pack size</label>
+                        <select id={`pack-${item.slug}`} onChange={(e) => setQuantity(item.slug, Number(e.target.value))} value={item.quantity}>
+                          {!(line?.packSizes ?? issue?.packSizes ?? []).includes(item.quantity) ? <option value={item.quantity}>Choose a pack…</option> : null}
+                          {(line?.packSizes ?? issue?.packSizes ?? []).filter((n) => !line || n <= line.stock || n === item.quantity).map((n) => <option key={n} value={n}>{n} pieces</option>)}
+                        </select>
+                      </div>
+                    ) : (
                     <div aria-label={`Quantity for ${name}`} className="quantity-control" role="group">
                       <button aria-label="Decrease quantity" disabled={item.quantity <= 1} onClick={() => setQuantity(item.slug, item.quantity - 1)} type="button"><Minus size={14} /></button>
                       <span>{item.quantity}</span>
                       <button aria-label="Increase quantity" disabled={item.quantity >= Math.min(MAX_LINE_QUANTITY, line?.stock ?? MAX_LINE_QUANTITY)} onClick={() => setQuantity(item.slug, item.quantity + 1)} type="button"><Plus size={14} /></button>
                     </div>
+                    )}
                     <strong>{line ? formatPaise(line.lineTotalPaise) : "—"}</strong>
                     <button aria-label={`Remove ${name} from cart`} className="remove-item" onClick={() => removeItem(item.slug)} type="button"><Trash2 size={16} /> Remove</button>
                   </div>
