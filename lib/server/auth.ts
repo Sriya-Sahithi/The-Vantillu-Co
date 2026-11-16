@@ -115,7 +115,7 @@ export async function requireAdmin(req: NextRequest, options: { owner?: boolean 
   const user = await getUserFromRequest(req);
   if (!user) throw unauthorized();
   if (!user.isAdmin) throw forbidden("Admin access required.");
-  if (options.owner && user.adminRole !== "owner") throw forbidden("Owner access required.");
+  if (user.adminRole !== "owner") throw forbidden("Owner access required.");
   return user;
 }
 
