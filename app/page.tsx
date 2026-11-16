@@ -32,11 +32,19 @@ export default function HomePage() {
           </div>
           <div className="hero-footnote"><span>01 / 04 Categories</span><span className="hero-rule" /><span>Order on WhatsApp</span></div>
         </div>
-        <div className="hero-image">
-          <Image alt="The Vantillu Co. authentic homemade food collection with artisanal podis, wholesome sweets, and chocolates on a rustic Indian kitchen table" fill priority sizes="(max-width: 800px) 100vw, 58vw" src="/images/hero-rustic-food.webp" />
-          <div className="hero-image-tag"><span>The Modern Millennial Kitchen</span><small>Hyderabad, India</small></div>
-          <div className="hero-stamp">
-            <Image alt="The Vantillu Co. circular brand seal" fill sizes="108px" src="/brand/kitchen-seal.webp" />
+        <div className="hero-image-wrap">
+          <div className="hero-image-frame">
+            <Image
+              alt="The Vantillu Co. authentic homemade food collection with artisanal podis, wholesome sweets, and chocolates on a rustic Indian kitchen table"
+              className="hero-main-img"
+              fill
+              priority
+              sizes="(max-width: 760px) calc(100vw - 42px), (max-width: 1024px) 50vw, 680px"
+              src="/images/hero-rustic-food.webp"
+            />
+            <div className="hero-stamp">
+              <Image alt="The Vantillu Co. circular brand seal" fill sizes="108px" src="/brand/kitchen-seal.webp" />
+            </div>
           </div>
         </div>
         <a className="scroll-cue" href="#categories"><ArrowDown size={15} /> Discover our collections</a>
