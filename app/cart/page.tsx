@@ -23,7 +23,7 @@ export default function CartPage() {
       return `• ${name} — ${item.quantity}${product && "packSizes" in product && product.packSizes ? " pieces" : " unit(s)"}`;
     }),
     "Please confirm availability, final pricing and local delivery options. Thank you!",
-  ].join("\\n");
+  ].join("\n");
   const whatsappUrl = getWhatsAppUrl(whatsappMessage);
 
   return (
@@ -103,7 +103,8 @@ export default function CartPage() {
             ) : (
               <button className="button button-primary summary-button" disabled type="button">Fix the items above to continue</button>
             )}
-            {whatsappUrl ? <a className="button button-outline summary-button" href={whatsappUrl} rel="noreferrer" target="_blank">Enquire about this cart on WhatsApp</a> : null}\n            <p className="privacy-note">Checkout is available for eligible products. WhatsApp enquiries are confirmed personally before an order is accepted.</p>
+            {whatsappUrl ? <a className="button button-outline summary-button" href={whatsappUrl} rel="noreferrer" target="_blank">Enquire about this cart on WhatsApp</a> : null}
+            <p className="privacy-note">Checkout is available for eligible products. WhatsApp enquiries are confirmed personally before an order is accepted.</p>
           </aside>
         </div>
       )}
