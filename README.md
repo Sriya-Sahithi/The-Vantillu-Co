@@ -101,7 +101,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 - `migrations/001_init.sql`: schema, indexes, constraints, RLS, privilege revokes.
 - `migrations/002_seed_catalogue.sql`: seeds the 14 existing products and 4 categories.
-- `migrations/003_pack_sizes_and_launch_prices.sql`: adds `products.pack_sizes` and sets the owner's launch prices (below). It only fills products that have no price, so it never overwrites later admin edits.
+- `migrations/003_pack_sizes_and_launch_prices.sql`: adds `products.pack_sizes` and sets the owner-provided launch prices (below). It only fills products that have no price, so it never overwrites later admin edits.\n- `migrations/004_local_first_owner_only.sql`: removes the inherited broad Hyderabad PIN-prefix seed and restricts admin roles to owner accounts. The owner must configure the actual local delivery PINs before checkout can accept orders.
 
 Tables: `users`, `customer_profiles`, `addresses`, `categories`, `products`, `product_images`, `orders`, `order_items` (price and description snapshots), `payments`, `refunds`, `order_status_history`, `delivery_settings`, `serviceable_postcodes`, `admin_roles`, `audit_log`, `auth_otps`, `sessions`, `notification_outbox`, `webhook_events`, `rate_limits`.
 
@@ -117,7 +117,7 @@ Pack sizes are enforced on the server: a chocolate order with any other quantity
 
 **Stock is not set by the migration.** Every product still has stock 0 and is unavailable, so nothing can be bought until you enter real stock and tick "Available for sale" in Admin → Products. Chocolates count stock in pieces. Podis count stock in packets.
 
-The default serviceable PIN prefix is `500` and the delivery fee is ₹0 with no free-delivery threshold. Set real values in the admin dashboard before launch.
+No delivery PIN is enabled by default after migration 004. Configure the actual initial serviceable PIN codes and delivery charges in Admin → Delivery before accepting orders. Do not enable a broad PIN prefix unless every PIN in that prefix is genuinely serviceable.
 
 Apply migrations with `npm run db:migrate` (needs `DATABASE_URL`). Applied migrations are tracked, so re-running is a no-op.
 
